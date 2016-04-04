@@ -36,6 +36,7 @@ set( MOC_Hdrs QtVTKRenderWindows.h )
 
 set( UIs QtVTKRenderWindows.ui )
 
+set(QRCs icons.qrc)
 include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
@@ -47,6 +48,22 @@ set(CMAKE_AUTOMOC ON)
 if(VTK_QT_VERSION VERSION_GREATER "4")
   find_package(Qt5 COMPONENTS Widgets REQUIRED QUIET)
   qt5_wrap_ui(UI_Srcs ${UIs})
+
+
+  qt5_add_resources(QRC_Srcs ${QRCs} )
+
+ source_group("Resources" FILES
+    ${UIs}
+    ${QRCs}
+    ${EXE_ICON} # Not present
+  )
+
+  source_group("Generated" FILES
+    ${UI_Srcs}
+    ${MOC_Srcs}
+    ${QRC_Srcs}
+    ${QRC_Srcs}
+  )
 
   # CMAKE_AUTOMOC in ON so the MocHdrs will be automatically wrapped.
   add_executable(QtVTKRenderWindows ${Srcs} ${Hdrs} ${UI_Srcs} ${MOC_Hdrs})
