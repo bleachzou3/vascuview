@@ -37,7 +37,14 @@ class vtkResliceCursorCallback : public vtkCommand
 public:
   static vtkResliceCursorCallback *New()
   { return new vtkResliceCursorCallback; }
-
+  ~vtkResliceCursorCallback()
+  {
+	  for(int i = 0;i < 3;i++)
+	  {
+		  RCW[i]->Delete();
+		  IPW[i]->Delete();
+	  }
+  }
   void Execute( vtkObject *caller, unsigned long ev,
                 void *callData )
     {
@@ -121,7 +128,8 @@ QtVTKRenderWindows::QtVTKRenderWindows( int vtkNotUsed(argc), char *argv[])
 {
   this->ui = new Ui_QtVTKRenderWindows;
   this->ui->setupUi(this);
-
+  connectActions();
+  /*
   vtkSmartPointer< vtkDICOMImageReader > reader =
     vtkSmartPointer< vtkDICOMImageReader >::New();
   reader->SetDirectoryName("E:/ZHANG_XIANGJU");
@@ -233,8 +241,151 @@ QtVTKRenderWindows::QtVTKRenderWindows( int vtkNotUsed(argc), char *argv[])
   this->ui->view1->show();
   this->ui->view2->show();
   this->ui->view3->show();
+  connectActions();
+  */
 
-  // Set up action signals and slots
+};
+
+ void QtVTKRenderWindows::openDirectoryDicom()
+{
+	  vtkSmartPointer< vtkDICOMImageReader > reader =
+    vtkSmartPointer< vtkDICOMImageReader >::New();
+  reader->SetDirectoryName("E:/ZHANG_XIANGJU");
+  reader->Update();
+  int imageDims[3];
+  reader->GetOutput()->GetDimensions(imageDims);
+
+
+  for (int i = 0; i < 3; i++)
+    {
+		
+
+		   if(riw[i] == 0)
+		   {
+             riw[i] = vtkSmartPointer< vtkResliceImageViewer >::New();
+		   }
+    }
+
+ 
+  this->ui->view1->SetRenderWindow(riw[0]->GetRenderWindow());
+  riw[0]->SetupInteractor(
+      this->ui->view1->GetRenderWindow()->GetInteractor());
+
+  this->ui->view2->SetRenderWindow(riw[1]->GetRenderWindow());
+  riw[1]->SetupInteractor(
+      this->ui->view2->GetRenderWindow()->GetInteractor());
+
+  this->ui->view3->SetRenderWindow(riw[2]->GetRenderWindow());
+  riw[2]->SetupInteractor(
+      this->ui->view3->GetRenderWindow()->GetInteractor());
+
+  for (int i = 0; i < 3; i++)
+    {
+    // make them all share the same reslice cursor object.
+    vtkResliceCursorLineRepresentation *rep =
+      vtkResliceCursorLineRepresentation::SafeDownCast(
+          riw[i]->GetResliceCursorWidget()->GetRepresentation());
+    riw[i]->SetResliceCursor(riw[0]->GetResliceCursor());
+
+    rep->GetResliceCursorActor()->
+      GetCursorAlgorithm()->SetReslicePlaneNormal(i);
+
+    riw[i]->SetInputData(reader->GetOutput());
+    riw[i]->SetSliceOrientation(i);
+    riw[i]->SetResliceModeToAxisAligned();
+	
+    }
+
+  vtkSmartPointer<vtkCellPicker> picker =
+    vtkSmartPointer<vtkCellPicker>::New();
+  picker->SetTolerance(0.005);
+
+  vtkSmartPointer<vtkProperty> ipwProp =
+    vtkSmartPointer<vtkProperty>::New();
+
+  vtkSmartPointer< vtkRenderer > ren =
+    vtkSmartPointer< vtkRenderer >::New();
+
+
+
+
+   this->ui->view4->GetRenderWindow()->AddRenderer(ren);
+  
+  vtkRenderWindowInteractor *iren = this->ui->view4->GetInteractor();
+  
+  for (int i = 0; i < 3; i++)
+    {
+	//if(planeWidget[i] == 0)
+	//{
+	  planeWidget[i] = vtkSmartPointer<vtkImagePlaneWidget>::New();
+	//}
+      
+	
+    planeWidget[i]->SetInteractor( iren );
+    planeWidget[i]->SetPicker(picker);
+    planeWidget[i]->RestrictPlaneToVolumeOn();
+    double color[3] = {0, 0, 0};
+    color[i] = 1;
+    planeWidget[i]->GetPlaneProperty()->SetColor(color);
+
+    color[0] /= 4.0;
+    color[1] /= 4.0;
+    color[2] /= 4.0;
+    riw[i]->GetRenderer()->SetBackground( color );
+
+    planeWidget[i]->SetTexturePlaneProperty(ipwProp);
+    planeWidget[i]->TextureInterpolateOff();
+    planeWidget[i]->SetResliceInterpolateToLinear();
+    planeWidget[i]->SetInputConnection(reader->GetOutputPort());
+	//planeWidget[i]->SetInputData(reader->GetOutput());
+    planeWidget[i]->SetPlaneOrientation(i);
+    planeWidget[i]->SetSliceIndex(imageDims[i]/2);
+    planeWidget[i]->DisplayTextOn();
+    planeWidget[i]->SetDefaultRenderer(ren);
+    planeWidget[i]->SetWindowLevel(1358, -27);
+    planeWidget[i]->On();
+    planeWidget[i]->InteractionOn();
+    }
+
+  vtkSmartPointer<vtkResliceCursorCallback> cbk =
+    vtkSmartPointer<vtkResliceCursorCallback>::New();
+
+  for (int i = 0; i < 3; i++)
+    {
+    cbk->IPW[i] = planeWidget[i];
+    cbk->RCW[i] = riw[i]->GetResliceCursorWidget();
+    riw[i]->GetResliceCursorWidget()->AddObserver(
+        vtkResliceCursorWidget::ResliceAxesChangedEvent, cbk );
+    riw[i]->GetResliceCursorWidget()->AddObserver(
+        vtkResliceCursorWidget::WindowLevelEvent, cbk );
+    riw[i]->GetResliceCursorWidget()->AddObserver(
+        vtkResliceCursorWidget::ResliceThicknessChangedEvent, cbk );
+    riw[i]->GetResliceCursorWidget()->AddObserver(
+        vtkResliceCursorWidget::ResetCursorEvent, cbk );
+    riw[i]->GetInteractorStyle()->AddObserver(
+        vtkCommand::WindowLevelEvent, cbk );
+
+    // Make them all share the same color map.
+    riw[i]->SetLookupTable(riw[0]->GetLookupTable());
+    planeWidget[i]->GetColorMap()->SetLookupTable(riw[0]->GetLookupTable());
+    //planeWidget[i]->GetColorMap()->SetInput(riw[i]->GetResliceCursorWidget()->GetResliceCursorRepresentation()->GetColorMap()->GetInput());
+    planeWidget[i]->SetColorMap(riw[i]->GetResliceCursorWidget()->GetResliceCursorRepresentation()->GetColorMap());
+
+    }
+
+  this->ui->view1->show();
+  this->ui->view2->show();
+  this->ui->view3->show();
+  this->ui->view4->GetRenderWindow()->Render();
+  //这一句我加的
+
+ // connectActions();
+}
+
+
+void QtVTKRenderWindows::connectActions()
+{
+	  // Set up action signals and slots
   connect(this->ui->actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
   connect(this->ui->resliceModeCheckBox, SIGNAL(stateChanged(int)), this, SLOT(resliceMode(int)));
   connect(this->ui->thickModeCheckBox, SIGNAL(stateChanged(int)), this, SLOT(thickMode(int)));
@@ -247,8 +398,10 @@ QtVTKRenderWindows::QtVTKRenderWindows( int vtkNotUsed(argc), char *argv[])
 
   connect(this->ui->resetButton, SIGNAL(pressed()), this, SLOT(ResetViews()));
   connect(this->ui->AddDistance1Button, SIGNAL(pressed()), this, SLOT(AddDistanceMeasurementToView1()));
-};
 
+  connect(this->ui->actionOpenDicomDirectory,SIGNAL(triggered()),this,SLOT(openDirectoryDicom()));
+
+}
 void QtVTKRenderWindows::slotExit()
 {
   qApp->exit();

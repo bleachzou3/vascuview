@@ -34,6 +34,9 @@ public slots:
   virtual void AddDistanceMeasurementToView1();
   virtual void AddDistanceMeasurementToView( int );
 
+  //打开所在的图像目录
+  virtual void openDirectoryDicom();
+
 protected:
   vtkSmartPointer< vtkResliceImageViewer > riw[3];
   vtkSmartPointer< vtkImagePlaneWidget > planeWidget[3];
@@ -46,6 +49,8 @@ private:
 
   // Designer form
   Ui_QtVTKRenderWindows *ui;
+
+  void connectActions();
 };
 
 #endif // QtVTKRenderWindows_H
