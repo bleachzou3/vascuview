@@ -29,8 +29,8 @@
 #include "vtkDistanceRepresentation2D.h"
 #include "vtkPointHandleRepresentation3D.h"
 #include "vtkPointHandleRepresentation2D.h"
-
-
+#include "qfiledialog.h"
+#include <string>
 //----------------------------------------------------------------------------
 class vtkResliceCursorCallback : public vtkCommand
 {
@@ -124,7 +124,7 @@ public:
 };
 
 
-QtVTKRenderWindows::QtVTKRenderWindows( int vtkNotUsed(argc), char *argv[])
+QtVTKRenderWindows::QtVTKRenderWindows( int vtkNotUsed(argc), char *argv[]):flag(false)
 {
   this->ui = new Ui_QtVTKRenderWindows;
   this->ui->setupUi(this);
@@ -248,13 +248,38 @@ QtVTKRenderWindows::QtVTKRenderWindows( int vtkNotUsed(argc), char *argv[])
 
  void QtVTKRenderWindows::openDirectoryDicom()
 {
+
+	
+	if(flag)
+	{
+		return;
+	}
+	flag = true;
+		    QFileDialog::Options options = QFileDialog::DontResolveSymlinks | QFileDialog::ShowDirsOnly;  
+    options |= QFileDialog::DontUseNativeDialog;  
+    QString directory = QFileDialog::getExistingDirectory(this,  
+                                    tr("Open Directory"),  
+                                    "/home",  
+                                    options);  
+
+	
+	this->ui->statusBar->showMessage(directory);
+
+	this->ui->view4->GetRenderWindow()->ClearInRenderStatus();
 	  vtkSmartPointer< vtkDICOMImageReader > reader =
     vtkSmartPointer< vtkDICOMImageReader >::New();
-  reader->SetDirectoryName("E:/ZHANG_XIANGJU");
+  //reader->SetDirectoryName("E:/ZHANG_XIANGJU");
+	  
+	  reader->SetDirectoryName(directory.toStdString().c_str());
   reader->Update();
   int imageDims[3];
   reader->GetOutput()->GetDimensions(imageDims);
 
+  //记得删除
+  //---------------------
+  if(planeWidget[0] != 0)
+    cout << planeWidget[0]->GetReferenceCount()<<endl;
+  //-----------------------------------
 
   for (int i = 0; i < 3; i++)
     {
@@ -306,53 +331,63 @@ QtVTKRenderWindows::QtVTKRenderWindows( int vtkNotUsed(argc), char *argv[])
   vtkSmartPointer< vtkRenderer > ren =
     vtkSmartPointer< vtkRenderer >::New();
 
-
+ 
 
 
    this->ui->view4->GetRenderWindow()->AddRenderer(ren);
   
   vtkRenderWindowInteractor *iren = this->ui->view4->GetInteractor();
-  
+ 
+
+ 
   for (int i = 0; i < 3; i++)
     {
-	//if(planeWidget[i] == 0)
-	//{
-	  planeWidget[i] = vtkSmartPointer<vtkImagePlaneWidget>::New();
-	//}
-      
+      if(planeWidget[i] == 0)
+	  {	
+	     planeWidget[i] = vtkSmartPointer<vtkImagePlaneWidget>::New();
+	  }
 	
-    planeWidget[i]->SetInteractor( iren );
-    planeWidget[i]->SetPicker(picker);
-    planeWidget[i]->RestrictPlaneToVolumeOn();
-    double color[3] = {0, 0, 0};
-    color[i] = 1;
-    planeWidget[i]->GetPlaneProperty()->SetColor(color);
+	  
+		planeWidget[i]->SetInteractor( iren );
+	
+		planeWidget[i]->SetPicker(picker);
+		planeWidget[i]->RestrictPlaneToVolumeOn();
+		double color[3] = {0, 0, 0};
+		color[i] = 1;
+		planeWidget[i]->GetPlaneProperty()->SetColor(color);
 
-    color[0] /= 4.0;
-    color[1] /= 4.0;
-    color[2] /= 4.0;
-    riw[i]->GetRenderer()->SetBackground( color );
+		color[0] /= 4.0;
+		color[1] /= 4.0;
+		color[2] /= 4.0;
+		riw[i]->GetRenderer()->SetBackground( color );
 
-    planeWidget[i]->SetTexturePlaneProperty(ipwProp);
-    planeWidget[i]->TextureInterpolateOff();
-    planeWidget[i]->SetResliceInterpolateToLinear();
-    planeWidget[i]->SetInputConnection(reader->GetOutputPort());
-	//planeWidget[i]->SetInputData(reader->GetOutput());
-    planeWidget[i]->SetPlaneOrientation(i);
-    planeWidget[i]->SetSliceIndex(imageDims[i]/2);
-    planeWidget[i]->DisplayTextOn();
-    planeWidget[i]->SetDefaultRenderer(ren);
-    planeWidget[i]->SetWindowLevel(1358, -27);
-    planeWidget[i]->On();
-    planeWidget[i]->InteractionOn();
+		planeWidget[i]->SetTexturePlaneProperty(ipwProp);
+		planeWidget[i]->TextureInterpolateOff();
+		planeWidget[i]->SetResliceInterpolateToLinear();
+		
+		planeWidget[i]->SetInputConnection(reader->GetOutputPort());
+	
+		//planeWidget[i]->SetInputData(reader->GetOutput());
+		planeWidget[i]->SetPlaneOrientation(i);
+		planeWidget[i]->SetSliceIndex(imageDims[i]/2);
+		planeWidget[i]->DisplayTextOn();
+		  
+		planeWidget[i]->SetDefaultRenderer(ren);
+		  
+		planeWidget[i]->SetWindowLevel(1358, -27);
+		planeWidget[i]->On();
+		planeWidget[i]->InteractionOn();
+	  
     }
 
   vtkSmartPointer<vtkResliceCursorCallback> cbk =
     vtkSmartPointer<vtkResliceCursorCallback>::New();
-
+ 
   for (int i = 0; i < 3; i++)
     {
+		
     cbk->IPW[i] = planeWidget[i];
+	  
     cbk->RCW[i] = riw[i]->GetResliceCursorWidget();
     riw[i]->GetResliceCursorWidget()->AddObserver(
         vtkResliceCursorWidget::ResliceAxesChangedEvent, cbk );
@@ -371,12 +406,26 @@ QtVTKRenderWindows::QtVTKRenderWindows( int vtkNotUsed(argc), char *argv[])
     //planeWidget[i]->GetColorMap()->SetInput(riw[i]->GetResliceCursorWidget()->GetResliceCursorRepresentation()->GetColorMap()->GetInput());
     planeWidget[i]->SetColorMap(riw[i]->GetResliceCursorWidget()->GetResliceCursorRepresentation()->GetColorMap());
 
+
+
     }
+
+
+
 
   this->ui->view1->show();
   this->ui->view2->show();
   this->ui->view3->show();
-  this->ui->view4->GetRenderWindow()->Render();
+ 
+  
+
+
+
+
+
+
+  //释放上一次遗留的
+
   //这一句我加的
 
  // connectActions();
@@ -458,6 +507,7 @@ void QtVTKRenderWindows::SetBlendModeToMeanIP()
 
 void QtVTKRenderWindows::ResetViews()
 {
+	/*
   // Reset the reslice image views
   for (int i = 0; i < 3; i++)
     {
@@ -479,6 +529,7 @@ void QtVTKRenderWindows::ResetViews()
 
   // Render in response to changes.
   this->Render();
+  */
 }
 
 void QtVTKRenderWindows::Render()

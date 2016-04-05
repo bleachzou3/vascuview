@@ -51,6 +51,9 @@ private:
   Ui_QtVTKRenderWindows *ui;
 
   void connectActions();
+
+  //是否已经打开过图像
+  bool flag;
 };
 
 #endif // QtVTKRenderWindows_H
