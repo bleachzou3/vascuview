@@ -30,7 +30,9 @@
 #include "vtkPointHandleRepresentation3D.h"
 #include "vtkPointHandleRepresentation2D.h"
 #include "qfiledialog.h"
+#include  "vtkLight.h"
 #include <string>
+#include <vtkvmtkImagePlaneWidget.h>
 //----------------------------------------------------------------------------
 class vtkResliceCursorCallback : public vtkCommand
 {
@@ -39,11 +41,7 @@ public:
   { return new vtkResliceCursorCallback; }
   ~vtkResliceCursorCallback()
   {
-	  for(int i = 0;i < 3;i++)
-	  {
-		  RCW[i]->Delete();
-		  IPW[i]->Delete();
-	  }
+
   }
   void Execute( vtkObject *caller, unsigned long ev,
                 void *callData )
@@ -264,14 +262,21 @@ QtVTKRenderWindows::QtVTKRenderWindows( int vtkNotUsed(argc), char *argv[]):flag
 
 	
 	this->ui->statusBar->showMessage(directory);
+	
 
+
+
+
+	//---------------------------------------
 	this->ui->view4->GetRenderWindow()->ClearInRenderStatus();
 	  vtkSmartPointer< vtkDICOMImageReader > reader =
     vtkSmartPointer< vtkDICOMImageReader >::New();
   //reader->SetDirectoryName("E:/ZHANG_XIANGJU");
 	  
-	  reader->SetDirectoryName(directory.toStdString().c_str());
+  reader->SetDirectoryName(directory.toStdString().c_str());
   reader->Update();
+
+
   int imageDims[3];
   reader->GetOutput()->GetDimensions(imageDims);
 
@@ -345,6 +350,7 @@ QtVTKRenderWindows::QtVTKRenderWindows( int vtkNotUsed(argc), char *argv[]):flag
       if(planeWidget[i] == 0)
 	  {	
 	     planeWidget[i] = vtkSmartPointer<vtkImagePlaneWidget>::New();
+		 // planeWidget[i] = vtkSmartPointer<vtkvmtkImagePlaneWidget>::New();
 	  }
 	
 	  
@@ -366,7 +372,7 @@ QtVTKRenderWindows::QtVTKRenderWindows( int vtkNotUsed(argc), char *argv[]):flag
 		planeWidget[i]->SetResliceInterpolateToLinear();
 		
 		planeWidget[i]->SetInputConnection(reader->GetOutputPort());
-	
+		
 		//planeWidget[i]->SetInputData(reader->GetOutput());
 		planeWidget[i]->SetPlaneOrientation(i);
 		planeWidget[i]->SetSliceIndex(imageDims[i]/2);
