@@ -6,6 +6,7 @@
 #include "vtkImagePlaneWidget.h"
 #include "vtkDistanceWidget.h"
 #include "vtkResliceImageViewerMeasurements.h"
+#include "vtkBoxWidget.h"
 #include <vtkvmtkImagePlaneWidget.h>
 #include <QMainWindow>
 
@@ -38,12 +39,18 @@ public slots:
   //打开所在的图像目录
   virtual void openDirectoryDicom();
 
+  //点击单选按钮BoxVisible后的操作
+  virtual void IsShowBoxWidget(bool visible);
+
 protected:
   vtkSmartPointer< vtkResliceImageViewer > riw[3];
   vtkSmartPointer< vtkImagePlaneWidget > planeWidget[3];
+  vtkSmartPointer<vtkBoxWidget> boxWidget;
   // vtkSmartPointer<vtkvmtkImagePlaneWidget> planeWidget[3];
   vtkSmartPointer< vtkDistanceWidget > DistanceWidget[3];
   vtkSmartPointer< vtkResliceImageViewerMeasurements > ResliceMeasurements;
+  
+ 
 
 protected slots:
 
@@ -51,8 +58,11 @@ private:
 
   // Designer form
   Ui_QtVTKRenderWindows *ui;
-
+  //做一些连接操作
   void connectActions();
+
+  //初始化一些3d组件,比如说一些
+  void init3DWidget();
 
   //是否已经打开过图像
   bool flag;
