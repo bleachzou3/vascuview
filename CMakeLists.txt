@@ -30,18 +30,30 @@ endif()
 # Set your files and resources here
 set( Srcs QtVTKRenderWindowsApp.cxx QtVTKRenderWindows.cxx VascuviewUtility.cpp)
 
-set( Hdrs QtVTKRenderWindows.h VascuviewUtility.h vtkResliceCursorCallback.h)
+set( Hdrs QtVTKRenderWindows.h VascuviewUtility.h vtkResliceCursorCallback.h vtkUpdateCubeCallback.h vtkHideCubeCallback.h)
 
 set( MOC_Hdrs QtVTKRenderWindows.h )
 
 set( UIs QtVTKRenderWindows.ui )
 
 set(QRCs icons.qrc)
+set(LinkedVmtk 
+vtkvmtkCommon
+vtkvmtkComputationalGeometry
+vtkvmtkContrib
+vtkvmtkDifferentialGeometry
+vtkvmtkIO
+vtkvmtkITK
+vtkvmtkMisc
+vtkvmtkRendering
+vtkvmtkSegmentation
+)
 include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}  
 )
-
+include_directories(VMTK_LIB/include ..)
+link_directories(VMTK_LIB/lib)  
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
 
@@ -68,7 +80,7 @@ if(VTK_QT_VERSION VERSION_GREATER "4")
   # CMAKE_AUTOMOC in ON so the MocHdrs will be automatically wrapped.
   add_executable(QtVTKRenderWindows ${Srcs} ${Hdrs} ${UI_Srcs} ${MOC_Hdrs})
   qt5_use_modules(QtVTKRenderWindows Core Gui Widgets)
-  target_link_libraries(QtVTKRenderWindows ${VTK_LIBRARIES})
+  target_link_libraries(QtVTKRenderWindows ${VTK_LIBRARIES} ${LinkedVmtk})
 else()
   find_package(Qt4 REQUIRED)
   include(${QT_USE_FILE})
