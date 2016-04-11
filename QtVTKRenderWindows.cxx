@@ -45,6 +45,8 @@ QtVTKRenderWindows::QtVTKRenderWindows( int vtkNotUsed(argc), char *argv[]):flag
   connectActions();
  
 
+
+
 };
 
 
