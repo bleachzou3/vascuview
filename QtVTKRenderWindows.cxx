@@ -33,6 +33,7 @@
 #include  "vtkLight.h"
 #include <string>
 #include "vtkResliceCursorCallback.h"
+
 //----------------------------------------------------------------------------
 
 
