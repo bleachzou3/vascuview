@@ -28,9 +28,9 @@ if("${VTK_QT_VERSION}" STREQUAL "")
 endif()
 
 # Set your files and resources here
-set( Srcs QtVTKRenderWindowsApp.cxx QtVTKRenderWindows.cxx)
+set( Srcs QtVTKRenderWindowsApp.cxx QtVTKRenderWindows.cxx VascuviewUtility.cpp)
 
-set( Hdrs QtVTKRenderWindows.h )
+set( Hdrs QtVTKRenderWindows.h VascuviewUtility.h vtkResliceCursorCallback.h)
 
 set( MOC_Hdrs QtVTKRenderWindows.h )
 

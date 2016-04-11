@@ -7,7 +7,9 @@
 #include "vtkDistanceWidget.h"
 #include "vtkResliceImageViewerMeasurements.h"
 #include "vtkBoxWidget.h"
-#include <vtkvmtkImagePlaneWidget.h>
+#include "vtkDICOMImageReader.h"
+#include "vtkCubeSource.h"
+#include "vtkActor.h"
 #include <QMainWindow>
 
 // Forward Qt class declarations
@@ -49,6 +51,10 @@ protected:
   // vtkSmartPointer<vtkvmtkImagePlaneWidget> planeWidget[3];
   vtkSmartPointer< vtkDistanceWidget > DistanceWidget[3];
   vtkSmartPointer< vtkResliceImageViewerMeasurements > ResliceMeasurements;
+
+   vtkSmartPointer< vtkDICOMImageReader > reader ;
+   vtkSmartPointer<vtkActor> cubeActor;
+   vtkSmartPointer<vtkCubeSource> cubeSource; 
   
  
 
@@ -61,7 +67,7 @@ private:
   //做一些连接操作
   void connectActions();
 
-  //初始化一些3d组件,比如说一些
+  //初始化一些3d组件,比如说一些vtkDicomImageReader
   void init3DWidget();
 
   //是否已经打开过图像

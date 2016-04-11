@@ -32,7 +32,6 @@
 #include "qfiledialog.h"
 #include  "vtkLight.h"
 #include <string>
-#include <vtkvmtkImagePlaneWidget.h>
 #include "vtkResliceCursorCallback.h"
 //----------------------------------------------------------------------------
 
@@ -41,10 +40,20 @@ QtVTKRenderWindows::QtVTKRenderWindows( int vtkNotUsed(argc), char *argv[]):flag
 {
   this->ui = new Ui_QtVTKRenderWindows;
   this->ui->setupUi(this);
+  init3DWidget();
   connectActions();
  
 
 };
+
+
+
+void QtVTKRenderWindows::init3DWidget()
+{
+	 reader =  vtkSmartPointer< vtkDICOMImageReader >::New();
+	 cubeActor = vtkSmartPointer<vtkActor>::New();
+	 cubeSource = vtkSmartPointer<vtkCubeSource>::New();
+}
 
  void QtVTKRenderWindows::openDirectoryDicom()
 {
@@ -75,8 +84,8 @@ QtVTKRenderWindows::QtVTKRenderWindows( int vtkNotUsed(argc), char *argv[]):flag
 
 	//---------------------------------------
 	//this->ui->view4->GetRenderWindow()->ClearInRenderStatus();
-	  vtkSmartPointer< vtkDICOMImageReader > reader =
-    vtkSmartPointer< vtkDICOMImageReader >::New();
+	//  vtkSmartPointer< vtkDICOMImageReader > reader =
+    //vtkSmartPointer< vtkDICOMImageReader >::New();
   //reader->SetDirectoryName("E:/ZHANG_XIANGJU");
 	  
   reader->SetDirectoryName(directory.toStdString().c_str());
@@ -88,8 +97,8 @@ QtVTKRenderWindows::QtVTKRenderWindows( int vtkNotUsed(argc), char *argv[]):flag
 
   //¼ÇµÃÉ¾³ý
   //---------------------
-  if(planeWidget[0] != 0)
-    cout << planeWidget[0]->GetReferenceCount()<<endl;
+  //if(planeWidget[0] != 0)
+   // cout << planeWidget[0]->GetReferenceCount()<<endl;
   //-----------------------------------
 
   for (int i = 0; i < 3; i++)
@@ -155,11 +164,10 @@ QtVTKRenderWindows::QtVTKRenderWindows( int vtkNotUsed(argc), char *argv[]):flag
 
 
    this->ui->view4->GetRenderWindow()->AddRenderer(ren);
-  
   vtkRenderWindowInteractor *iren = this->ui->view4->GetInteractor();
- 
+  boxWidget->SetInteractor(iren);
 
- 
+
   for (int i = 0; i < 3; i++)
     {
       if(planeWidget[i] == 0)
@@ -369,8 +377,27 @@ void QtVTKRenderWindows::AddDistanceMeasurementToView1()
 
 
 void QtVTKRenderWindows::IsShowBoxWidget(bool visible)
-{
-	cout << visible << endl;
+{   
+	/*
+	*
+	*/
+	if(!flag)
+	{
+		return;
+	}
+	if(visible)
+	{
+		boxWidget->SetPriority(2);
+		boxWidget->SetHandleSize(5E-3);
+		boxWidget->SetInputConnection(reader->GetOutputPort());
+		boxWidget->PlaceWidget();
+		boxWidget->RotationEnabledOff();
+
+		boxWidget->On();
+	}else
+	{
+		boxWidget->Off();
+	}
 }
 void QtVTKRenderWindows::AddDistanceMeasurementToView(int i)
 {
