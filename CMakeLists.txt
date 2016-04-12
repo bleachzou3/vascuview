@@ -35,6 +35,8 @@ set( Hdrs QtVTKRenderWindows.h VascuviewUtility.h vtkResliceCursorCallback.h vtk
 set( MOC_Hdrs QtVTKRenderWindows.h )
 
 set( UIs QtVTKRenderWindows.ui )
+#加入log4cpp配置文件
+set( LOGs log4cpp.conf )
 
 set(QRCs icons.qrc)
 set(LinkedVmtk 
@@ -60,7 +62,7 @@ include_directories(VMTK_LIB/include ..)
 link_directories(VMTK_LIB/lib)  
 
 #加入log4cpp
-include_directories(LOG_HOME/include/log4cpp ..)
+include_directories(LOG_HOME/include ..)
 link_directories(LOG_HOME/lib)  
 
 # Instruct CMake to run moc automatically when needed.
@@ -77,6 +79,7 @@ if(VTK_QT_VERSION VERSION_GREATER "4")
     ${UIs}
     ${QRCs}
     ${EXE_ICON} # Not present
+	${LOGs}
   )
 
   source_group("Generated" FILES
