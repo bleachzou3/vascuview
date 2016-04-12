@@ -48,12 +48,21 @@ vtkvmtkMisc
 vtkvmtkRendering
 vtkvmtkSegmentation
 )
+set(LinkedLog
+log4cpp
+)
 include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}  
 )
+#加入VMTK_LIB
 include_directories(VMTK_LIB/include ..)
 link_directories(VMTK_LIB/lib)  
+
+#加入log4cpp
+include_directories(LOG_HOME/include/log4cpp ..)
+link_directories(LOG_HOME/lib)  
+
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
 
@@ -80,7 +89,7 @@ if(VTK_QT_VERSION VERSION_GREATER "4")
   # CMAKE_AUTOMOC in ON so the MocHdrs will be automatically wrapped.
   add_executable(QtVTKRenderWindows ${Srcs} ${Hdrs} ${UI_Srcs} ${MOC_Hdrs})
   qt5_use_modules(QtVTKRenderWindows Core Gui Widgets)
-  target_link_libraries(QtVTKRenderWindows ${VTK_LIBRARIES} ${LinkedVmtk})
+  target_link_libraries(QtVTKRenderWindows ${VTK_LIBRARIES} ${LinkedVmtk} ${LinkedLog})
 else()
   find_package(Qt4 REQUIRED)
   include(${QT_USE_FILE})

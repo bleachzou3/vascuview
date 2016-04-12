@@ -21,7 +21,7 @@ public:
 	virtual void Execute(vtkObject *caller, unsigned long ev,
                 void *callData)
 	{
-		vtkCommand::EndInteractionEvent
+	
 		
 		if(ev == vtkCommand::DisableEvent||ev == vtkCommand::StartInteractionEvent)
 		{
