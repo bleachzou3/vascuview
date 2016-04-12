@@ -22,7 +22,7 @@ public:
 
   // Constructor/Destructor
   QtVTKRenderWindows(int argc, char *argv[]);
-  ~QtVTKRenderWindows() {}
+  ~QtVTKRenderWindows();
 
 public slots:
 

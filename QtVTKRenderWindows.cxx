@@ -31,6 +31,8 @@
 #include "vtkPointHandleRepresentation2D.h"
 #include "qfiledialog.h"
 #include  "vtkLight.h"
+#include "vtkHideCubeCallback.h"
+#include "vtkUpdateCubeCallback.h"
 #include <string>
 #include "vtkResliceCursorCallback.h"
 
@@ -384,6 +386,7 @@ void QtVTKRenderWindows::IsShowBoxWidget(bool visible)
 	/*
 	*
 	*/
+	//flag代表有没有图像读进来
 	if(!flag)
 	{
 		return;
@@ -395,7 +398,15 @@ void QtVTKRenderWindows::IsShowBoxWidget(bool visible)
 		boxWidget->SetInputConnection(reader->GetOutputPort());
 		boxWidget->PlaceWidget();
 		boxWidget->RotationEnabledOff();
-
+		vtkSmartPointer<vtkHideCubeCallback> hcc = vtkSmartPointer<vtkHideCubeCallback>::New();
+		hcc->setObject(cubeActor);
+		vtkSmartPointer<vtkUpdateCubeCallback> ucc = vtkSmartPointer<vtkUpdateCubeCallback>::New();
+		ucc->setCubeActor(cubeActor);
+		ucc->setCubeSource(cubeSource);
+		boxWidget->AddObserver(vtkCommand::StartInteractionEvent,hcc);
+		boxWidget->AddObserver(vtkCommand::EndInteractionEvent,ucc);
+		boxWidget->AddObserver(vtkCommand::EnableEvent,ucc);
+		boxWidget->AddObserver(vtkCommand::DisableEvent,hcc);
 		boxWidget->On();
 	}else
 	{
@@ -436,4 +447,11 @@ void QtVTKRenderWindows::AddDistanceMeasurementToView(int i)
 
   this->DistanceWidget[i]->CreateDefaultRepresentation();
   this->DistanceWidget[i]->EnabledOn();
+}
+
+QtVTKRenderWindows:: ~QtVTKRenderWindows()
+{
+	//如果没有这句话，当boxWiget还在显示时如果程序退出，会出错，具体什么原因就不知道了
+	boxWidget->Off();
+
 }
