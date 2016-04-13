@@ -11,6 +11,6 @@ public:
 	~VascuviewUtility(); 
 
 public:
-	static vtkImageData* extractVoi(vtkImageData*data,vector<double>&BoxBounds);
+	static void VascuviewUtility::extractVoi(vtkImageData*data,double* BoxBounds,vtkImageData*croppedImageData);
 };
 #endif

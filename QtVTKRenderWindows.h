@@ -44,6 +44,9 @@ public slots:
   //点击单选按钮BoxVisible后的操作
   virtual void IsShowBoxWidget(bool visible);
 
+
+  //进行图像截取并保存
+  virtual void croppedImageActivity();
 protected:
   vtkSmartPointer< vtkResliceImageViewer > riw[3];
   vtkSmartPointer< vtkImagePlaneWidget > planeWidget[3];

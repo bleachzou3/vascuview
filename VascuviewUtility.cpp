@@ -3,9 +3,9 @@
 #include <vtkSmartPointer.h>
 #include <vtkExtractVOI.h>
 #include <algorithm>
-vtkImageData* VascuviewUtility::extractVoi(vtkImageData*data,vector<double>&BoxBounds)
+void VascuviewUtility::extractVoi(vtkImageData*data,double* BoxBounds,vtkImageData*croppedImageData)
 {
-	cout << data->GetReferenceCount()<<endl;
+	
 	int wholeExtent[6];
 	data->GetExtent(wholeExtent);
 	double origin[3];
@@ -32,6 +32,6 @@ vtkImageData* VascuviewUtility::extractVoi(vtkImageData*data,vector<double>&BoxB
 
 	
 	//vtkImageData* result = vtkImageData::New();
-	return eVoi->GetOutput();
+	croppedImageData->DeepCopy(eVoi->GetOutput());
 
 }

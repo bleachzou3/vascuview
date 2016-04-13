@@ -35,6 +35,7 @@
 #include "vtkUpdateCubeCallback.h"
 #include <string>
 #include "vtkResliceCursorCallback.h"
+#include "VascuviewUtility.h"
 
 //----------------------------------------------------------------------------
 
@@ -70,7 +71,7 @@ void QtVTKRenderWindows::init3DWidget()
 		return;
 	}
 	*/
-	    flag = true;
+	  
     
 		    QFileDialog::Options options = QFileDialog::DontResolveSymlinks | QFileDialog::ShowDirsOnly;  
     options |= QFileDialog::DontUseNativeDialog;  
@@ -79,7 +80,12 @@ void QtVTKRenderWindows::init3DWidget()
                                     "/home",  
                                     options);  
 
-	
+	//如果没有选择目录就为空
+	if(directory.isEmpty())
+	{
+		return;
+	}
+	flag = true;
 	this->ui->statusBar->showMessage(directory);
 	
 
@@ -286,6 +292,7 @@ void QtVTKRenderWindows::connectActions()
   connect(this->ui->AddDistance1Button, SIGNAL(pressed()), this, SLOT(AddDistanceMeasurementToView1()));
   connect(this->ui->clickedVtkBoxWidget,SIGNAL(clicked(bool)),this,SLOT(IsShowBoxWidget(bool)));
   connect(this->ui->actionOpenDicomDirectory,SIGNAL(triggered()),this,SLOT(openDirectoryDicom()));
+  connect(this->ui->croppedImageButton,SIGNAL(clicked()),this,SLOT(croppedImageActivity()));
 
 }
 void QtVTKRenderWindows::slotExit()
@@ -413,7 +420,7 @@ void QtVTKRenderWindows::IsShowBoxWidget(bool visible)
 		boxWidget->AddObserver(vtkCommand::EndInteractionEvent,ucc);
 		boxWidget->AddObserver(vtkCommand::EnableEvent,ucc);
 		boxWidget->AddObserver(vtkCommand::DisableEvent,hcc);
-
+	
 
 		boxWidget->On();
 	}else
@@ -467,4 +474,56 @@ QtVTKRenderWindows:: ~QtVTKRenderWindows()
 	{
 	  boxWidget->Off();
 	}
+}
+void QtVTKRenderWindows::croppedImageActivity()
+{
+
+	log4cpp::Category& rootLog  = log4cpp::Category::getRoot();	
+	log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
+	
+     QFileDialog* saveFileDialog = new QFileDialog(this);  
+     saveFileDialog->setWindowTitle(QString("Save File"));  
+     saveFileDialog->setFileMode(QFileDialog::AnyFile);  
+     saveFileDialog->setNameFilter(tr("file (*.vtk)"));  
+     QString* fileName=new QString(); 
+	 //saveFileDialog->show();
+     if(saveFileDialog->exec())  
+        *fileName = saveFileDialog->getSaveFileName();  
+		
+     if(fileName->size() > 0) {  
+		 rootLog.info("QtVTKRenderWindows类croppedImageActivity():"+fileName->toStdString());
+		 subLog.info("QtVTKRenderWindows类croppedImageActivity():"+fileName->toStdString());
+     }else
+	 {
+	   rootLog.info("QtVTKRenderWindows类croppedImageActivity():没有选择文件");
+	   subLog.info("QtVTKRenderWindows类croppedImageActivity():没有选择文件");
+	   delete fileName;
+	   fileName = NULL;  
+	   return;
+	 }
+     delete fileName;  
+     fileName = NULL;  
+
+
+
+
+	
+	vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+	boxWidget->GetPolyData(polyData);
+	polyData->ComputeBounds();
+
+	double bounds[6];
+	polyData->GetBounds(bounds);
+
+	
+	rootLog.info("QtVTKRenderWindows类croppedImageActivity()%lf , %lf , %lf , %lf , %lf , %lf" , bounds[0],bounds[1],bounds[2],bounds[3],bounds[4],bounds[5]);
+	subLog.info("QtVTKRenderWindows类croppedImageActivity()%lf , %lf , %lf , %lf , %lf , %lf" , bounds[0],bounds[1],bounds[2],bounds[3],bounds[4],bounds[5]);
+
+	vtkSmartPointer<vtkImageData> croppedImageData = vtkSmartPointer<vtkImageData>::New();
+	//cout << croppedImageData->GetReferenceCount() << endl;
+	VascuviewUtility::extractVoi(reader->GetOutput(),bounds,croppedImageData);
+
+
+
+	
 }
