@@ -22,7 +22,7 @@ int main( int argc, char** argv )
   // QT Stuff
   QApplication app( argc, argv );
 
-  QtVTKRenderWindows myQtVTKRenderWindows(argc, argv);
+  QtVTKRenderWindows myQtVTKRenderWindows;
   myQtVTKRenderWindows.show();
 
   return app.exec();

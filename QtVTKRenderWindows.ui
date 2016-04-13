@@ -96,6 +96,19 @@
        <bool>true</bool>
       </property>
      </widget>
+     <widget class="QPushButton" name="croppedImageButton">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>30</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>CropImage</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -333,5 +346,22 @@
  <resources>
   <include location="icons.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>clickedVtkBoxWidget</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>croppedImageButton</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>72</x>
+     <y>102</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>189</x>
+     <y>105</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

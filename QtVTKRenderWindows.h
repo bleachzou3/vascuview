@@ -21,7 +21,7 @@ class QtVTKRenderWindows : public QMainWindow
 public:
 
   // Constructor/Destructor
-  QtVTKRenderWindows(int argc, char *argv[]);
+  QtVTKRenderWindows();
   ~QtVTKRenderWindows();
 
 public slots:
@@ -72,6 +72,8 @@ private:
 
   //是否已经打开过图像
   bool flag;
+
+  bool boxWidgetOn;
   
 };
 

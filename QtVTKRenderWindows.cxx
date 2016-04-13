@@ -39,10 +39,11 @@
 //----------------------------------------------------------------------------
 
 
-QtVTKRenderWindows::QtVTKRenderWindows( int vtkNotUsed(argc), char *argv[]):flag(false)
+QtVTKRenderWindows::QtVTKRenderWindows( ):flag(false),boxWidgetOn(false)
 {
   this->ui = new Ui_QtVTKRenderWindows;
   this->ui->setupUi(this);
+
   init3DWidget();
   connectActions();
  
@@ -251,8 +252,10 @@ void QtVTKRenderWindows::init3DWidget()
   this->ui->view2->show();
   this->ui->view3->show();
  
-  
-
+  //当重新打开一张图像的时候，这些按钮的可见性需要重新设置
+  this->ui->clickedVtkBoxWidget->setVisible(true);
+  this->ui->clickedVtkBoxWidget->setChecked(false);
+  this->ui->croppedImageButton->setVisible(false);
 
 
 
@@ -393,6 +396,8 @@ void QtVTKRenderWindows::IsShowBoxWidget(bool visible)
 	}
 	if(visible)
 	{
+		boxWidgetOn = true;
+
 		boxWidget->SetPriority(2);
 		boxWidget->SetHandleSize(5E-3);
 		boxWidget->SetInputConnection(reader->GetOutputPort());
@@ -403,14 +408,20 @@ void QtVTKRenderWindows::IsShowBoxWidget(bool visible)
 		vtkSmartPointer<vtkUpdateCubeCallback> ucc = vtkSmartPointer<vtkUpdateCubeCallback>::New();
 		ucc->setCubeActor(cubeActor);
 		ucc->setCubeSource(cubeSource);
+
 		boxWidget->AddObserver(vtkCommand::StartInteractionEvent,hcc);
 		boxWidget->AddObserver(vtkCommand::EndInteractionEvent,ucc);
 		boxWidget->AddObserver(vtkCommand::EnableEvent,ucc);
 		boxWidget->AddObserver(vtkCommand::DisableEvent,hcc);
+
+
 		boxWidget->On();
 	}else
 	{
+		boxWidgetOn = false;
+
 		boxWidget->Off();
+		
 	}
 }
 void QtVTKRenderWindows::AddDistanceMeasurementToView(int i)
@@ -452,6 +463,8 @@ void QtVTKRenderWindows::AddDistanceMeasurementToView(int i)
 QtVTKRenderWindows:: ~QtVTKRenderWindows()
 {
 	//如果没有这句话，当boxWiget还在显示时如果程序退出，会出错，具体什么原因就不知道了
-	boxWidget->Off();
-
+	if(boxWidget != 0)
+	{
+	  boxWidget->Off();
+	}
 }
