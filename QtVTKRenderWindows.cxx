@@ -36,7 +36,8 @@
 #include <string>
 #include "vtkResliceCursorCallback.h"
 #include "VascuviewUtility.h"
-
+#include "vtkXMLImageDataWriter.h"
+#include "vtkDataObject.h"
 //----------------------------------------------------------------------------
 
 
@@ -478,36 +479,32 @@ QtVTKRenderWindows:: ~QtVTKRenderWindows()
 void QtVTKRenderWindows::croppedImageActivity()
 {
 
+
+
 	log4cpp::Category& rootLog  = log4cpp::Category::getRoot();	
 	log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
-	
-     QFileDialog* saveFileDialog = new QFileDialog(this);  
-     saveFileDialog->setWindowTitle(QString("Save File"));  
-     saveFileDialog->setFileMode(QFileDialog::AnyFile);  
-     saveFileDialog->setNameFilter(tr("file (*.vtk)"));  
-     QString* fileName=new QString(); 
-	 //saveFileDialog->show();
-     if(saveFileDialog->exec())  
-        *fileName = saveFileDialog->getSaveFileName();  
-		
-     if(fileName->size() > 0) {  
-		 rootLog.info("QtVTKRenderWindows类croppedImageActivity():"+fileName->toStdString());
-		 subLog.info("QtVTKRenderWindows类croppedImageActivity():"+fileName->toStdString());
-     }else
-	 {
+	//让用户选择一个文件名进行保存截取的图像
+	QString filename = QFileDialog::getSaveFileName(this,  
+    tr("Save Image"),  
+    "",  
+    tr("*.vtk")); //选择路径  
+	std::string cppFileName;
+	if(filename.isEmpty())
+	{
 	   rootLog.info("QtVTKRenderWindows类croppedImageActivity():没有选择文件");
 	   subLog.info("QtVTKRenderWindows类croppedImageActivity():没有选择文件");
-	   delete fileName;
-	   fileName = NULL;  
 	   return;
-	 }
-     delete fileName;  
-     fileName = NULL;  
+	}else
+	{
+		cppFileName = filename.toStdString();
+		rootLog.info("QtVTKRenderWindows类croppedImageActivity():"+cppFileName);
+		subLog.info("QtVTKRenderWindows类croppedImageActivity():"+cppFileName);
+	}
 
 
-
-
+    
 	
+
 	vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
 	boxWidget->GetPolyData(polyData);
 	polyData->ComputeBounds();
@@ -522,7 +519,22 @@ void QtVTKRenderWindows::croppedImageActivity()
 	vtkSmartPointer<vtkImageData> croppedImageData = vtkSmartPointer<vtkImageData>::New();
 	//cout << croppedImageData->GetReferenceCount() << endl;
 	VascuviewUtility::extractVoi(reader->GetOutput(),bounds,croppedImageData);
+   
+	vtkSmartPointer<vtkXMLImageDataWriter> vtiWriter = vtkSmartPointer<vtkXMLImageDataWriter>::New();
 
+	vtiWriter->SetInputData(croppedImageData);
+	vtiWriter->SetFileName(filename.toStdString().c_str());
+
+	if(vtiWriter->Write())
+	{
+		rootLog.info("QtVTKRenderWindows类croppedImageActivity():保存成功"+cppFileName);
+		subLog.info("QtVTKRenderWindows类croppedImageActivity():保存成功"+cppFileName);
+	}else
+	{
+		rootLog.info("QtVTKRenderWindows类croppedImageActivity():保存失败"+cppFileName);
+		subLog.info("QtVTKRenderWindows类croppedImageActivity():保存失败"+cppFileName);
+	}
+	
 
 
 	
