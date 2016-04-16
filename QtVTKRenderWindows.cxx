@@ -58,7 +58,9 @@ QtVTKRenderWindows::QtVTKRenderWindows( ):flag(false),boxWidgetOn(false)
 
 void QtVTKRenderWindows::init3DWidget()
 {
+
 	 reader =  vtkSmartPointer< vtkDICOMImageReader >::New();
+	 readerVti = vtkSmartPointer<vtkXMLImageDataReader>::New();
 	 cubeActor = vtkSmartPointer<vtkActor>::New();
 	 cubeSource = vtkSmartPointer<vtkCubeSource>::New();
 }
@@ -87,6 +89,7 @@ void QtVTKRenderWindows::init3DWidget()
 		return;
 	}
 	flag = true;
+	readerFlag = 0;
 	this->ui->statusBar->showMessage(directory);
 	
 
@@ -294,6 +297,7 @@ void QtVTKRenderWindows::connectActions()
   connect(this->ui->clickedVtkBoxWidget,SIGNAL(clicked(bool)),this,SLOT(IsShowBoxWidget(bool)));
   connect(this->ui->actionOpenDicomDirectory,SIGNAL(triggered()),this,SLOT(openDirectoryDicom()));
   connect(this->ui->croppedImageButton,SIGNAL(clicked()),this,SLOT(croppedImageActivity()));
+  connect(this->ui->actionActionOpenVti,SIGNAL(triggered()),this,SLOT(openVtiDicom()));
 
 }
 void QtVTKRenderWindows::slotExit()
@@ -408,7 +412,13 @@ void QtVTKRenderWindows::IsShowBoxWidget(bool visible)
 
 		boxWidget->SetPriority(2);
 		boxWidget->SetHandleSize(5E-3);
-		boxWidget->SetInputConnection(reader->GetOutputPort());
+		if(readerFlag == 0)
+		{
+		  boxWidget->SetInputConnection(reader->GetOutputPort());
+		}else if(readerFlag == 1)
+		{
+		   boxWidget->SetInputConnection(readerVti->GetOutputPort());
+		}
 		boxWidget->PlaceWidget();
 		boxWidget->RotationEnabledOff();
 		vtkSmartPointer<vtkHideCubeCallback> hcc = vtkSmartPointer<vtkHideCubeCallback>::New();
@@ -478,8 +488,11 @@ QtVTKRenderWindows:: ~QtVTKRenderWindows()
 }
 void QtVTKRenderWindows::croppedImageActivity()
 {
-
-
+	//没有图像读进来，直接返回
+	if(!flag)
+	{
+		return;
+	}
 
 	log4cpp::Category& rootLog  = log4cpp::Category::getRoot();	
 	log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
@@ -518,8 +531,13 @@ void QtVTKRenderWindows::croppedImageActivity()
 
 	vtkSmartPointer<vtkImageData> croppedImageData = vtkSmartPointer<vtkImageData>::New();
 	//cout << croppedImageData->GetReferenceCount() << endl;
-	VascuviewUtility::extractVoi(reader->GetOutput(),bounds,croppedImageData);
-   
+	if(readerFlag == 0 )
+	{
+	   VascuviewUtility::extractVoi(reader->GetOutput(),bounds,croppedImageData);
+	}else if(readerFlag == 1)
+	{
+		VascuviewUtility::extractVoi(readerVti->GetOutput(),bounds,croppedImageData);
+	}
 	vtkSmartPointer<vtkXMLImageDataWriter> vtiWriter = vtkSmartPointer<vtkXMLImageDataWriter>::New();
 
 	vtiWriter->SetInputData(croppedImageData);
@@ -538,4 +556,203 @@ void QtVTKRenderWindows::croppedImageActivity()
 
 
 	
+}
+
+
+void QtVTKRenderWindows::openVtiDicom()
+{
+	cout << "helloOpenVtiDicom" << endl;
+	QString fileName = QFileDialog::getOpenFileName(this,  
+                                                tr("打开文件"),  
+                                                "/",  
+                                                tr(  "vti文件(*.vti)"));  
+
+
+
+
+	//如果没有选择目录就为空
+	if(fileName.length() == 0)
+	{
+
+		return;
+	}
+	flag = true;
+	readerFlag = 1 ;
+	this->ui->statusBar->showMessage(fileName);
+	
+
+
+
+
+
+
+	//---------------------------------------
+	//this->ui->view4->GetRenderWindow()->ClearInRenderStatus();
+	//  vtkSmartPointer< vtkDICOMImageReader > reader =
+    //vtkSmartPointer< vtkDICOMImageReader >::New();
+  //reader->SetDirectoryName("E:/ZHANG_XIANGJU");
+  
+	readerVti->SetFileName(fileName.toStdString().c_str());
+    readerVti->Update();
+
+
+  int imageDims[3];
+  readerVti->GetOutput()->GetDimensions(imageDims);
+
+  //记得删除
+  //---------------------
+  //if(planeWidget[0] != 0)
+   // cout << planeWidget[0]->GetReferenceCount()<<endl;
+  //-----------------------------------
+
+  for (int i = 0; i < 3; i++)
+    {
+		
+
+		   if(riw[i] == 0)
+		   {
+             riw[i] = vtkSmartPointer< vtkResliceImageViewer >::New();
+		   }
+    }
+
+ 
+  this->ui->view1->SetRenderWindow(riw[0]->GetRenderWindow());
+  riw[0]->SetupInteractor(
+      this->ui->view1->GetRenderWindow()->GetInteractor());
+
+  this->ui->view2->SetRenderWindow(riw[1]->GetRenderWindow());
+  riw[1]->SetupInteractor(
+      this->ui->view2->GetRenderWindow()->GetInteractor());
+
+  this->ui->view3->SetRenderWindow(riw[2]->GetRenderWindow());
+  riw[2]->SetupInteractor(
+      this->ui->view3->GetRenderWindow()->GetInteractor());
+
+  for (int i = 0; i < 3; i++)
+    {
+    // make them all share the same reslice cursor object.
+    vtkResliceCursorLineRepresentation *rep =
+      vtkResliceCursorLineRepresentation::SafeDownCast(
+          riw[i]->GetResliceCursorWidget()->GetRepresentation());
+    riw[i]->SetResliceCursor(riw[0]->GetResliceCursor());
+
+    rep->GetResliceCursorActor()->
+      GetCursorAlgorithm()->SetReslicePlaneNormal(i);
+
+    riw[i]->SetInputData(readerVti->GetOutput());
+    riw[i]->SetSliceOrientation(i);
+    riw[i]->SetResliceModeToAxisAligned();
+	
+    }
+
+  vtkSmartPointer<vtkCellPicker> picker =
+    vtkSmartPointer<vtkCellPicker>::New();
+  picker->SetTolerance(0.005);
+
+  vtkSmartPointer<vtkProperty> ipwProp =
+    vtkSmartPointer<vtkProperty>::New();
+
+  vtkSmartPointer< vtkRenderer > ren =
+    vtkSmartPointer< vtkRenderer >::New();
+
+ //自己后期添加，想试着在同一个QTVTKrenderer实例中载入不同的图片。
+  vtkSmartPointer<vtkRenderWindow> new1 = vtkSmartPointer<vtkRenderWindow>::New();
+  this->ui->view4->SetRenderWindow(new1);
+
+  if(boxWidget == 0)
+  {
+	  boxWidget = vtkSmartPointer<vtkBoxWidget>::New();
+  }
+  //-----------------------------------------------------------------
+
+
+
+   this->ui->view4->GetRenderWindow()->AddRenderer(ren);
+  vtkRenderWindowInteractor *iren = this->ui->view4->GetInteractor();
+  boxWidget->SetInteractor(iren);
+
+
+  for (int i = 0; i < 3; i++)
+    {
+      if(planeWidget[i] == 0)
+	  {	
+	     planeWidget[i] = vtkSmartPointer<vtkImagePlaneWidget>::New();
+		 // planeWidget[i] = vtkSmartPointer<vtkvmtkImagePlaneWidget>::New();
+	  }
+	
+	  
+		planeWidget[i]->SetInteractor( iren );
+	
+		planeWidget[i]->SetPicker(picker);
+		planeWidget[i]->RestrictPlaneToVolumeOn();
+		double color[3] = {0, 0, 0};
+		color[i] = 1;
+		planeWidget[i]->GetPlaneProperty()->SetColor(color);
+
+		color[0] /= 4.0;
+		color[1] /= 4.0;
+		color[2] /= 4.0;
+		riw[i]->GetRenderer()->SetBackground( color );
+
+		planeWidget[i]->SetTexturePlaneProperty(ipwProp);
+		planeWidget[i]->TextureInterpolateOff();
+		planeWidget[i]->SetResliceInterpolateToLinear();
+		
+		planeWidget[i]->SetInputConnection(readerVti->GetOutputPort());
+		
+		//planeWidget[i]->SetInputData(reader->GetOutput());
+		planeWidget[i]->SetPlaneOrientation(i);
+		planeWidget[i]->SetSliceIndex(imageDims[i]/2);
+		planeWidget[i]->DisplayTextOn();
+		  
+		planeWidget[i]->SetDefaultRenderer(ren);
+		  
+		planeWidget[i]->SetWindowLevel(1358, -27);
+		planeWidget[i]->On();
+		planeWidget[i]->InteractionOn();
+	  
+    }
+
+  vtkSmartPointer<vtkResliceCursorCallback> cbk =
+    vtkSmartPointer<vtkResliceCursorCallback>::New();
+ 
+  for (int i = 0; i < 3; i++)
+    {
+		
+    cbk->IPW[i] = planeWidget[i];
+	  
+    cbk->RCW[i] = riw[i]->GetResliceCursorWidget();
+    riw[i]->GetResliceCursorWidget()->AddObserver(
+        vtkResliceCursorWidget::ResliceAxesChangedEvent, cbk );
+    riw[i]->GetResliceCursorWidget()->AddObserver(
+        vtkResliceCursorWidget::WindowLevelEvent, cbk );
+    riw[i]->GetResliceCursorWidget()->AddObserver(
+        vtkResliceCursorWidget::ResliceThicknessChangedEvent, cbk );
+    riw[i]->GetResliceCursorWidget()->AddObserver(
+        vtkResliceCursorWidget::ResetCursorEvent, cbk );
+    riw[i]->GetInteractorStyle()->AddObserver(
+        vtkCommand::WindowLevelEvent, cbk );
+
+    // Make them all share the same color map.
+    riw[i]->SetLookupTable(riw[0]->GetLookupTable());
+    planeWidget[i]->GetColorMap()->SetLookupTable(riw[0]->GetLookupTable());
+    //planeWidget[i]->GetColorMap()->SetInput(riw[i]->GetResliceCursorWidget()->GetResliceCursorRepresentation()->GetColorMap()->GetInput());
+    planeWidget[i]->SetColorMap(riw[i]->GetResliceCursorWidget()->GetResliceCursorRepresentation()->GetColorMap());
+
+
+
+    }
+
+
+
+
+  this->ui->view1->show();
+  this->ui->view2->show();
+  this->ui->view3->show();
+ 
+  //当重新打开一张图像的时候，这些按钮的可见性需要重新设置
+  this->ui->clickedVtkBoxWidget->setVisible(true);
+  this->ui->clickedVtkBoxWidget->setChecked(false);
+  this->ui->croppedImageButton->setVisible(false);
+
 }

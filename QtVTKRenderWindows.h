@@ -10,6 +10,7 @@
 #include "vtkDICOMImageReader.h"
 #include "vtkCubeSource.h"
 #include "vtkActor.h"
+#include "vtkXMLImageDataReader.h"
 #include <QMainWindow>
 
 // Forward Qt class declarations
@@ -38,9 +39,11 @@ public slots:
   virtual void AddDistanceMeasurementToView1();
   virtual void AddDistanceMeasurementToView( int );
 
-  //打开所在的图像目录
+  //打开dicom图像所在的图像目录
   virtual void openDirectoryDicom();
 
+  //打开vti格式的图像，主要是截取后的
+  virtual void openVtiDicom();
   //点击单选按钮BoxVisible后的操作
   virtual void IsShowBoxWidget(bool visible);
 
@@ -55,7 +58,12 @@ protected:
   vtkSmartPointer< vtkDistanceWidget > DistanceWidget[3];
   vtkSmartPointer< vtkResliceImageViewerMeasurements > ResliceMeasurements;
 
+  //从目录下读取dicom图像
    vtkSmartPointer< vtkDICOMImageReader > reader ;
+
+   //读取某个vti文件
+   vtkSmartPointer<vtkXMLImageDataReader> readerVti;
+   
    vtkSmartPointer<vtkActor> cubeActor;
    vtkSmartPointer<vtkCubeSource> cubeSource; 
   
@@ -77,6 +85,9 @@ private:
   bool flag;
 
   bool boxWidgetOn;
+
+  //标记使用哪个reader,0:代表reader,1代表readerVti
+  int readerFlag;
   
 };
 

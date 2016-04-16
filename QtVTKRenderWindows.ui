@@ -278,7 +278,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionOpenDicomDirectory"/>
-   <addaction name="actionSave"/>
+   <addaction name="actionActionOpenVti"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionOpenFile">
@@ -342,6 +342,18 @@
    </property>
    <property name="toolTip">
     <string>open directory(where dicom images in)</string>
+   </property>
+  </action>
+  <action name="actionActionOpenVti">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/Icons/openVti.png</normaloff>:/Icons/openVti.png</iconset>
+   </property>
+   <property name="text">
+    <string>actionOpenVti</string>
+   </property>
+   <property name="toolTip">
+    <string>open dicom image(vti format)</string>
    </property>
   </action>
  </widget>
