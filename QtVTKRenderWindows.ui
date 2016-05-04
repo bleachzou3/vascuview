@@ -74,11 +74,11 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
-      <string>Tab 1</string>
+      <string>导入图像</string>
      </attribute>
      <widget class="QRadioButton" name="clickedVtkBoxWidget">
       <property name="geometry">
@@ -118,6 +118,11 @@
        <bool>false</bool>
       </property>
      </widget>
+    </widget>
+    <widget class="QWidget" name="tab_3">
+     <attribute name="title">
+      <string>切割血管</string>
+     </attribute>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -260,12 +265,12 @@
       </widget>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_3">
-     <attribute name="title">
-      <string>页</string>
-     </attribute>
-    </widget>
    </widget>
+   <zorder>tabWidget</zorder>
+   <zorder>view2</zorder>
+   <zorder>view4</zorder>
+   <zorder>view3</zorder>
+   <zorder>view1</zorder>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
