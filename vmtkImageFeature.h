@@ -14,14 +14,24 @@ private:
   double DerivativeSigma;
   int SigmoidRemapping;
   double UpwindFactor;
-  vector<int> FWHMRadius;
+  int FWHMRadius[3];
   
   double FWHMBackgroundValue;
 public:
 	vmtkImageFeature();
 	virtual ~vmtkImageFeature();
+	//originalData是原始图像,res图像是结果图像，传进来之前已经初始化，或者说已经分配内存，不是在这个函数内部分配内存
 	void BuildVTKGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res);
-	
+
+
+	//originalData是原始图像,res图像是结果图像，传进来之前已经初始化，或者说已经分配内存，不是在这个函数内部分配内存
+	void BuildFWHMBasedFeatureImage(vtkImageData*originalData,vtkImageData* res);
+
+
+	//originalData是原始图像,res图像是结果图像，传进来之前已经初始化，或者说已经分配内存，不是在这个函数内部分配内存
+	void BuildUpwindGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res);
+
+	void BuildGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res);
 };
 
 #endif

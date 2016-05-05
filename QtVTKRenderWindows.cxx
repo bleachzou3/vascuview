@@ -500,7 +500,7 @@ void QtVTKRenderWindows::croppedImageActivity()
 	QString filename = QFileDialog::getSaveFileName(this,  
     tr("Save Image"),  
     "",  
-    tr("*.vtk")); //选择路径  
+    tr("*.vti")); //选择路径  
 	std::string cppFileName;
 	if(filename.isEmpty())
 	{
@@ -554,7 +554,7 @@ void QtVTKRenderWindows::croppedImageActivity()
 	}
 	
 
-
+	
 	
 }
 
