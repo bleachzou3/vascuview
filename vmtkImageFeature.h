@@ -31,6 +31,7 @@ public:
 	//originalData是原始图像,res图像是结果图像，传进来之前已经初始化，或者说已经分配内存，不是在这个函数内部分配内存
 	void BuildUpwindGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res);
 
+	//originalData是原始图像,res图像是结果图像，传进来之前已经初始化，或者说已经分配内存，不是在这个函数内部分配内存
 	void BuildGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res);
 };
 
