@@ -5,7 +5,7 @@
 #include <vtkvmtkThresholdSegmentationLevelSetImageFilter.h>
 #include "NullPointerException.h"
 #include <vtkvmtkLaplacianSegmentationLevelSetImageFilter.h>
-
+#include <vtkImageMathematics.h>
 vmtkLevelSetSegmentation::vmtkLevelSetSegmentation()
 {
 	    PropagationScaling = 0.0;
@@ -149,4 +149,18 @@ void vmtkLevelSetSegmentation::LevelSetEvolutionLAPLACIAN(vtkImageData*originalI
 			levelSetsL->Update();
 
 			LevelSetsOutput->DeepCopy(levelSetsL->GetOutput());
+}
+
+void vmtkLevelSetSegmentation::MergeMergeLevelSet(vtkImageData*LevelSetInput1,vtkImageData*LevelSetInput2)
+{
+	if(LevelSetInput1 == 0|| LevelSetInput2 == 0)
+	{
+		throw NullPointerException("输入图像参数不能为空指针");
+	}
+	vtkSmartPointer<vtkImageMathematics> minFilter = vtkSmartPointer<vtkImageMathematics>::New();
+	minFilter->SetOperationToMin();
+	minFilter->SetInput1Data(LevelSetInput1);
+	minFilter->SetInput2Data(LevelSetInput2);
+	minFilter->Update();
+	LevelSetInput1->DeepCopy(minFilter->GetOutput());
 }
