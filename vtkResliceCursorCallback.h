@@ -17,7 +17,7 @@ public:
   {
 
   }
-  void Execute( vtkObject *caller, unsigned long ev,
+  void Execute( vtkObject * caller , unsigned long ev,
                 void *callData )
     {
 
