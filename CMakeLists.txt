@@ -140,9 +140,11 @@ if("${VTK_QT_VERSION}" STREQUAL "")
 endif()
 
 # Set your files and resources here
-set( Srcs QtVTKRenderWindowsApp.cxx QtVTKRenderWindows.cxx VascuviewUtility.cpp)
+set( Srcs QtVTKRenderWindowsApp.cxx QtVTKRenderWindows.cxx VascuviewUtility.cpp vmtkImageFeatures.cpp vmtkLevelSetSegmentation.cpp
+  vmtkSurfaceViewer.cpp)
 
-set( Hdrs QtVTKRenderWindows.h VascuviewUtility.h vtkResliceCursorCallback.h vtkUpdateCubeCallback.h vtkHideCubeCallback.h)
+set( Hdrs QtVTKRenderWindows.h VascuviewUtility.h vtkResliceCursorCallback.h vtkUpdateCubeCallback.h vtkHideCubeCallback.h NullPointerException.h
+   vmtkImageFeature.h vmtkLevelSetSegmentation.h vtkAddSeedCallBack.h vmtkSurfaceViewer.h)
 
 set( MOC_Hdrs QtVTKRenderWindows.h )
 
