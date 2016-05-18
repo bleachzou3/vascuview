@@ -1,6 +1,6 @@
 #ifndef VMTK_SURFACE_VIEWER_HPP_
 #define VMTK_SURFACE_VIEWER_HPP_
-
+using namespace std;
 #include <vtkRenderer.h>
 #include <vtkActor.h>
 #include <vtkImageData.h>
@@ -44,11 +44,11 @@ private:
 
 	double Linewidth;
 
-	string Representation;
+	std::string Representation;
 
 private:
 	vector<double> getEnumerateColorTransferFunctionParam(int NumberOfColors);
-	void SetSurfaceRepresentation(string Representation);
+	void SetSurfaceRepresentation(std::string Representation);
 
 };
 
