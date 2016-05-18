@@ -15,13 +15,17 @@ public:
 	void buildViewWithTag();
 	void buildView();
 private:
+	int FlatInterpolation;
+
+
+	double color[3];
 	//renderer从外面传进来的实例，不是本类方法中形成的
 	vtkRenderer* renderer;
 
 	//Actor，是本类方法中形成的
 	vtkPolyData * Surface;
 
-	//这里面有一个Actor是在这里实例化的
+	//这里面有一个Actor是在这里实例化的,为什么选择在这里实例化,它有一条删除的语句
 	vtkActor* Actor;
 
     std::string ArrayName;
@@ -29,6 +33,23 @@ private:
 	int DisplayCellData;
 
 	double ScalarRange[2];
+
+	int Grayscale;
+
+	std::string ColorMap;
+
+	int NumberOfColors;
+
+	double Opacity;
+
+	double Linewidth;
+
+	string Representation;
+
+private:
+	vector<double> getEnumerateColorTransferFunctionParam(int NumberOfColors);
+	void SetSurfaceRepresentation(string Representation);
+
 };
 
 #endif
