@@ -486,6 +486,10 @@ QtVTKRenderWindows:: ~QtVTKRenderWindows()
 	  boxWidget->Off();
 	}
 }
+
+/**
+*里面主要动作从vmtkimagevoiselector.py中获取
+*/
 void QtVTKRenderWindows::croppedImageActivity()
 {
 	//没有图像读进来，直接返回
