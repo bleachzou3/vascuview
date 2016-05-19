@@ -50,6 +50,8 @@ private:
 
 	int Display;
 
+	std::string RegionTagArrayName;
+
 private:
 	vector<double> getEnumerateColorTransferFunctionParam(int NumberOfColors);
 	void SetSurfaceRepresentation(std::string Representation);

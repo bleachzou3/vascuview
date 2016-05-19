@@ -28,6 +28,7 @@ vmtkSurfaceViewer::vmtkSurfaceViewer(vtkRenderer* grender)
 	Display = 1;
 	Representation = "surface";
 	NumberOfColors = 256;
+	RegionTagArrayName = "RegionTagArray";
 }
 
 vmtkSurfaceViewer::~vmtkSurfaceViewer()
@@ -44,7 +45,9 @@ void vmtkSurfaceViewer::buildView()
 
 	if(Surface == 0)
 	{
-		throw NullPointerException("vmtkSurfaceViewer::buildView(),surface不能为空指针需要传进来.");
+		rootLog.error("vmtkSurfaceViewer::buildView(),surface不能为空指针需要传进来.");
+		subLog.error("vmtkSurfaceViewer::buildView(),surface不能为空指针需要传进来.");
+		return;
 	}
 
 	if(Actor)
@@ -52,9 +55,6 @@ void vmtkSurfaceViewer::buildView()
 		renderer->RemoveActor(Actor);
 		Actor->Delete();
 	
-	}else
-	{
-		throw NullPointerException("vmtkSurfaceViewer::buildView(),vtkActor不能为空指针需要传进来.");
 	}
 
 	if(Surface)
@@ -215,5 +215,46 @@ void vmtkSurfaceViewer::SetSurfaceRepresentation(string representation)
         Actor->GetProperty()->EdgeVisibilityOff();
 	}
 	Representation = representation;
+
+}
+
+void vmtkSurfaceViewer::buildViewWithTag()
+{
+    log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
+	log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
+
+	if(Surface == 0)
+	{
+		rootLog.error("vmtkSurfaceViewer::buildView(),surface不能为空指针需要传进来.");
+		subLog.error("vmtkSurfaceViewer::buildView(),surface不能为空指针需要传进来.");
+		return;
+	}
+	if(Surface->GetPointData()->GetArray(RegionTagArrayName.c_str()) == 0 && Surface->GetCellData()->GetArray(RegionTagArrayName.c_str()) == 0)
+	{
+		rootLog.error("vmtkSurfaceViewer::buildView(),关于RegionTagArrayName的标量都不存在.");
+		subLog.error("vmtkSurfaceViewer::buildView(),关于RegionTagArrayName的标量都不存在.");
+		return;
+	}
+	if(Actor)
+	{		
+		renderer->RemoveActor(Actor);
+		Actor->Delete();
+	
+	}
+
+	if(Surface->GetPointData()->GetArray(RegionTagArrayName.c_str()) != 0)
+	{
+		vtkSmartPointer<vtkDataArray> regionTagArray= Surface->GetPointData()->GetArray(RegionTagArrayName.c_str());
+		for(int j  = 0; j < Surface->GetNumberOfPoints();j++)
+		{
+			//regionTagArray->GetTuple1(j)
+		}
+	}else if(Surface->GetCellData()->GetArray(RegionTagArrayName.c_str()) != 0)
+	{
+
+	}
+
+
+
 
 }
