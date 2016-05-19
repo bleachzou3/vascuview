@@ -38,6 +38,10 @@ vmtkSurfaceViewer::~vmtkSurfaceViewer()
 void vmtkSurfaceViewer::buildView()
 {
     //当前的唯一渲染实例带着这Actor,这里看起来挺危险的
+	
+	log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
+	log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
+
 	if(Surface == 0)
 	{
 		throw NullPointerException("vmtkSurfaceViewer::buildView(),surface不能为空指针需要传进来.");
@@ -48,6 +52,9 @@ void vmtkSurfaceViewer::buildView()
 		renderer->RemoveActor(Actor);
 		Actor->Delete();
 	
+	}else
+	{
+		throw NullPointerException("vmtkSurfaceViewer::buildView(),vtkActor不能为空指针需要传进来.");
 	}
 
 	if(Surface)
@@ -87,6 +94,8 @@ void vmtkSurfaceViewer::buildView()
 		{
 			mapper->ScalarVisibilityOff();
 		}
+		rootLog.info("vmtkSurfaceViewer.cpp buildView() ColorMap" + ColorMap);
+		subLog.info("vmtkSurfaceViewer.cpp buildView() ColorMap" + ColorMap);
 
 		vtkLookupTable * lut;
 		if(ColorMap == "grayscale")
