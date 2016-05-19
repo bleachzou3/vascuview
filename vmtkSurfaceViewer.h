@@ -46,6 +46,8 @@ private:
 
 	std::string Representation;
 
+	int Display;
+
 private:
 	vector<double> getEnumerateColorTransferFunctionParam(int NumberOfColors);
 	void SetSurfaceRepresentation(std::string Representation);

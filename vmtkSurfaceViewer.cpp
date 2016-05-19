@@ -25,7 +25,7 @@ vmtkSurfaceViewer::vmtkSurfaceViewer(vtkRenderer* grender)
 	Grayscale = 0;
 	FlatInterpolation = 0;
 	ColorMap = "cooltowarm";
-
+	Display = 1;
 	Representation = "surface";
 	NumberOfColors = 256;
 }
@@ -165,7 +165,10 @@ void vmtkSurfaceViewer::buildView()
 		}
 		SetSurfaceRepresentation(Representation);
 		renderer->AddActor(Actor);
-
+		if(Display)
+		{
+			renderer->Render();
+		}
 
 
 
