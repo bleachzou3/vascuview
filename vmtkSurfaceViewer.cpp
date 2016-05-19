@@ -247,8 +247,29 @@ void vmtkSurfaceViewer::buildViewWithTag()
 		vtkSmartPointer<vtkDataArray> regionTagArray= Surface->GetPointData()->GetArray(RegionTagArrayName.c_str());
 		for(int j  = 0; j < Surface->GetNumberOfPoints();j++)
 		{
-			//regionTagArray->GetTuple1(j)
+			if(TagSet.find(regionTagArray->GetTuple1(j)) == TagSet.end())
+			{
+				TagSet.insert(make_pair(regionTagArray->GetTuple1(j),1));
+			}
+
 		}
+		std::map<double,int> tagSetCopy = TagSet;
+		vtkSmartPointer<vtkPoints> labelPoints =  vtkSmartPointer<vtkPoints>::New();
+		labelPoints->SetNumberOfPoints(TagSet.size());
+		double point[4] = {0.0,0.0,0.0,0.0};
+		for(int j = 0; j <Surface->GetNumberOfPoints();j++)
+		{
+			double item = regionTagArray->GetTuple1(j);
+			if(tagSetCopy.find(item) != tagSetCopy.end())
+			{
+				Surface->GetPoint(j,point);
+				labelPoints->SetPoint(TagSet[item],point);
+				tagSetCopy.erase(item);
+			}
+		}
+		Surface->GetPointData()->SetActiveScalars(RegionTagArrayName.c_str());
+
+
 	}else if(Surface->GetCellData()->GetArray(RegionTagArrayName.c_str()) != 0)
 	{
 
