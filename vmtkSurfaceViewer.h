@@ -54,6 +54,8 @@ private:
 
 	std::map<double,int> TagSet;
 
+	int NumberOfRegions;
+
 private:
 	vector<double> getEnumerateColorTransferFunctionParam(int NumberOfColors);
 	void SetSurfaceRepresentation(std::string Representation);

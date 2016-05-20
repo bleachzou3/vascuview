@@ -7,6 +7,10 @@
 #include <vtkScalarsToColors.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkProperty.h>
+#include <vtkCellCenters.h>
+#include <vtkLabeledDataMapper.h>
+#include <vtkTextProperty.h>
+#include <vtkActor2D.h>
 vmtkSurfaceViewer::vmtkSurfaceViewer(vtkRenderer* grender)
 {
 	if(grender == 0)
@@ -29,6 +33,7 @@ vmtkSurfaceViewer::vmtkSurfaceViewer(vtkRenderer* grender)
 	Representation = "surface";
 	NumberOfColors = 256;
 	RegionTagArrayName = "RegionTagArray";
+	NumberOfRegions = 0;
 }
 
 vmtkSurfaceViewer::~vmtkSurfaceViewer()
@@ -241,7 +246,7 @@ void vmtkSurfaceViewer::buildViewWithTag()
 		Actor->Delete();
 	
 	}
-
+	vtkSmartPointer<vtkPoints> labelPoints;
 	if(Surface->GetPointData()->GetArray(RegionTagArrayName.c_str()) != 0)
 	{
 		vtkSmartPointer<vtkDataArray> regionTagArray= Surface->GetPointData()->GetArray(RegionTagArrayName.c_str());
@@ -253,8 +258,17 @@ void vmtkSurfaceViewer::buildViewWithTag()
 			}
 
 		}
+		NumberOfRegions = TagSet.size();
+		map<double,int>::iterator itr = TagSet.begin();
+		int index = 0;
+		while(itr != TagSet.end())
+		{
+			itr->second = index;
+			index++;
+			itr++;
+		}
 		std::map<double,int> tagSetCopy = TagSet;
-		vtkSmartPointer<vtkPoints> labelPoints =  vtkSmartPointer<vtkPoints>::New();
+	    labelPoints =  vtkSmartPointer<vtkPoints>::New();
 		labelPoints->SetNumberOfPoints(TagSet.size());
 		double point[4] = {0.0,0.0,0.0,0.0};
 		for(int j = 0; j <Surface->GetNumberOfPoints();j++)
@@ -272,10 +286,110 @@ void vmtkSurfaceViewer::buildViewWithTag()
 
 	}else if(Surface->GetCellData()->GetArray(RegionTagArrayName.c_str()) != 0)
 	{
+		vtkSmartPointer<vtkDataArray> regionTagArray= Surface->GetCellData()->GetArray(RegionTagArrayName.c_str());
+		for(int j  = 0; j < Surface->GetNumberOfCells;j++)
+		{
+			if(TagSet.find(regionTagArray->GetTuple1(j)) == TagSet.end())
+			{
+				TagSet.insert(make_pair(regionTagArray->GetTuple1(j),1));
+			}
+
+		}
+		NumberOfRegions = TagSet.size();
+		map<double,int>::iterator itr = TagSet.begin();
+		int index = 0;
+		while(itr != TagSet.end())
+		{
+			itr->second = index;
+			index++;
+			itr++;
+		}
+		std::map<double,int> tagSetCopy = TagSet;
+        labelPoints =  vtkSmartPointer<vtkPoints>::New();
+		labelPoints->SetNumberOfPoints(TagSet.size());
+		double point[4] = {0.0,0.0,0.0,0.0};
+
+		vtkSmartPointer<vtkCellCenters> cellCenters = vtkSmartPointer<vtkCellCenters>::New();
+		cellCenters->SetInputData(Surface);
+		cellCenters->Update();
+		vtkSmartPointer<vtkDataArray> regionTagArrayCenters = 
+		cellCenters->GetOutput()->GetPointData()->GetArray(RegionTagArrayName.c_str);
+		for(int  i = 0; i < cellCenters->GetOutput()->GetNumberOfPoints();i++)
+		{
+			double item = regionTagArrayCenters->GetTuple1(i);
+			if(tagSetCopy.find(item) != tagSetCopy.end())
+			{
+				cellCenters->GetOutput()->GetPoint(i,point);
+				labelPoints->SetPoint(TagSet[item],point);
+				tagSetCopy.erase(item);
+			}
+		}
+		Surface->GetCellData()->SetActiveScalars(RegionTagArrayName.c_str);
 
 	}
+	vtkSmartPointer<vtkPolyData> labelPolyData = vtkSmartPointer<vtkPolyData>::New();
+	labelPolyData->SetPoints(labelPoints);
+
+	vtkSmartPointer<vtkIntArray> labelArray = vtkSmartPointer<vtkIntArray>::New();
+	labelArray->SetNumberOfComponents(1);
+	labelArray->SetNumberOfTuples(NumberOfRegions);
+	labelArray->SetName("label");
+	labelArray->FillComponent(0,0);
+
+
+	labelPolyData->GetPointData()->AddArray(labelArray);
+
+	std::map<double,int>::iterator itr = TagSet.begin();
+    
+	int index = 0;
+	int size = TagSet.size();
+	int minScalarRange,maxScalarRange;
+	while(itr != TagSet.end())
+	{
+		if(index == 0)
+		{
+			minScalarRange = itr->first;
+		}
+		if(index == size - 1)
+		{
+			maxScalarRange = itr->first;
+		}
+		index++;
+		labelArray->SetTuple1(itr->second,itr->first);
+	}
+
+	labelPolyData->GetPointData()->SetActiveScalars("label");
+
+	vtkSmartPointer<vtkLabeledDataMapper> labelsMapper = vtkSmartPointer<vtkLabeledDataMapper>::New();
+	
+	labelsMapper->SetInputData(labelPolyData);
+	labelsMapper->SetLabelModeToLabelScalars();
+	
+
+	 labelsMapper->GetLabelTextProperty()->SetColor(1, 1, 1);
+     labelsMapper->GetLabelTextProperty()->SetFontSize(14);
+	 vtkSmartPointer<vtkActor2D> labelsActor = vtkSmartPointer<vtkActor2D>::New();
+	 labelsActor->SetMapper(labelsMapper);
+	 renderer->AddActor(labelsActor);
+	 
+
+	 vtkSmartPointer<vtkPolyDataMapper> surfaceMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	 surfaceMapper->SetInputData(Surface);
+	 surfaceMapper->ScalarVisibilityOn();
+	 surfaceMapper->SetScalarRange(minScalarRange,maxScalarRange);
 
 
 
+
+	 
+
+
+
+
+	
+
+
+
+	
 
 }
