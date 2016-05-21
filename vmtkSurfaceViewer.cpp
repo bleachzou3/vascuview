@@ -178,6 +178,14 @@ void vmtkSurfaceViewer::buildView()
 		   Actor->GetProperty()->SetInterpolationToFlat();
 		}
 		SetSurfaceRepresentation(Representation);
+
+		/**
+		*这边本来有一个改变surfaceRepresentation的交互
+		*/
+
+
+
+
 		renderer->AddActor(Actor);
 		if(Display)
 		{
@@ -379,8 +387,34 @@ void vmtkSurfaceViewer::buildViewWithTag()
 	 surfaceMapper->SetScalarRange(minScalarRange,maxScalarRange);
 
 
+	 if(Actor)
+	{		
+		renderer->RemoveActor(Actor);
+		Actor->Delete();
+	
+	}
 
+	 Actor = vtkActor::New();
+	 Actor->SetMapper(surfaceMapper);
+	 Actor->GetProperty()->SetOpacity(Opacity);
+	 Actor->GetProperty()->SetLineWidth(Linewidth);
+	 if(FlatInterpolation)
+	 {
+		 Actor->GetProperty()->SetInterpolationToFlat();
+	 }
 
+	 SetSurfaceRepresentation(Representation);
+
+		/**
+		*这边本来有一个改变surfaceRepresentation的交互
+		*/
+
+	 renderer->AddActor(Actor);
+
+	 if(Display)
+	 {
+		 renderer->Render();
+	 }
 	 
 
 
