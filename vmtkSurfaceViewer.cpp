@@ -295,7 +295,7 @@ void vmtkSurfaceViewer::buildViewWithTag()
 	}else if(Surface->GetCellData()->GetArray(RegionTagArrayName.c_str()) != 0)
 	{
 		vtkSmartPointer<vtkDataArray> regionTagArray= Surface->GetCellData()->GetArray(RegionTagArrayName.c_str());
-		for(int j  = 0; j < Surface->GetNumberOfCells;j++)
+		for(int j  = 0; j < Surface->GetNumberOfCells();j++)
 		{
 			if(TagSet.find(regionTagArray->GetTuple1(j)) == TagSet.end())
 			{
@@ -321,7 +321,7 @@ void vmtkSurfaceViewer::buildViewWithTag()
 		cellCenters->SetInputData(Surface);
 		cellCenters->Update();
 		vtkSmartPointer<vtkDataArray> regionTagArrayCenters = 
-		cellCenters->GetOutput()->GetPointData()->GetArray(RegionTagArrayName.c_str);
+		cellCenters->GetOutput()->GetPointData()->GetArray(RegionTagArrayName.c_str());
 		for(int  i = 0; i < cellCenters->GetOutput()->GetNumberOfPoints();i++)
 		{
 			double item = regionTagArrayCenters->GetTuple1(i);
@@ -332,7 +332,7 @@ void vmtkSurfaceViewer::buildViewWithTag()
 				tagSetCopy.erase(item);
 			}
 		}
-		Surface->GetCellData()->SetActiveScalars(RegionTagArrayName.c_str);
+		Surface->GetCellData()->SetActiveScalars(RegionTagArrayName.c_str());
 
 	}
 	vtkSmartPointer<vtkPolyData> labelPolyData = vtkSmartPointer<vtkPolyData>::New();

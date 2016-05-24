@@ -27,7 +27,7 @@ private:
 	//Actor，是本类方法中形成的
 	vtkPolyData * Surface;
 
-	//这里面有一个Actor是在这里实例化的,为什么选择在这里实例化,它有一条删除的语句
+	//这里面Actor是在这里实例化的,为什么选择在这里实例化,它有一条删除的语句
 	vtkActor* Actor;
 
     std::string ArrayName;

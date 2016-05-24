@@ -164,3 +164,4 @@ void vmtkLevelSetSegmentation::MergeMergeLevelSet(vtkImageData*LevelSetInput1,vt
 	minFilter->Update();
 	LevelSetInput1->DeepCopy(minFilter->GetOutput());
 }
+
