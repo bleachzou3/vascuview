@@ -6,9 +6,10 @@ using namespace std;
 #include <vtkImageData.h>
 #include <vtkPolyData.h>
 #include <string>
+#include "Uncopyable.h"
 #include <log4cpp/Category.hh>
 #include <log4cpp/PropertyConfigurator.hh>
-class vmtkSurfaceViewer
+class vmtkSurfaceViewer:private Uncopyable 
 {
 public:
 	vmtkSurfaceViewer(vtkRenderer* grenderer);
