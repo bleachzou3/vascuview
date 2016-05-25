@@ -8,7 +8,11 @@
 #include <log4cpp/Category.hh>
 #include <log4cpp/PropertyConfigurator.hh>
 #include <vtkAddSeedCallBack.h>
-class vmtkImageSeeder
+#include <string>
+#include <vtkPointData.h>
+#include <vtkGlyph3D.h>
+#include "Uncopyable.h"
+class vmtkImageSeeder:private Uncopyable
 {
 public:
 	vmtkImageSeeder();
@@ -26,6 +30,24 @@ private:
 	vtkImagePlaneWidget*planes[3];
 
 	int Display;
+
+    /**
+	*本类创建
+	*/
+	vtkSmartPointer<vtkCellPicker> Picker;
+
+	/**
+	*本类创建
+	*/
+	vtkSmartPointer<vtkPolyData> Seeds;
+
+	std::string ArrayName;
+
+private:
+	void InitializeSeeds();
+
+	void BuildView();
+
 	
 
 };

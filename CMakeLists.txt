@@ -141,10 +141,11 @@ endif()
 
 # Set your files and resources here
 set( Srcs QtVTKRenderWindowsApp.cxx QtVTKRenderWindows.cxx VascuviewUtility.cpp vmtkImageFeatures.cpp vmtkLevelSetSegmentation.cpp
-  vmtkSurfaceViewer.cpp)
+  vmtkSurfaceViewer.cpp vmtkImageInitialization.cpp vmtkImageSeeder.cpp)
 
 set( Hdrs QtVTKRenderWindows.h VascuviewUtility.h vtkResliceCursorCallback.h vtkUpdateCubeCallback.h vtkHideCubeCallback.h NullPointerException.h
-   vmtkImageFeature.h vmtkLevelSetSegmentation.h vtkAddSeedCallBack.h vmtkSurfaceViewer.h)
+   vmtkImageFeature.h vmtkLevelSetSegmentation.h vtkAddSeedCallBack.h vmtkSurfaceViewer.h vmtkImageSeeder.h vmtkImageInitialization.h
+  Uncopyable.h )
 
 set( MOC_Hdrs QtVTKRenderWindows.h )
 

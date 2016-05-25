@@ -3,6 +3,7 @@
 vmtkImageSeeder::vmtkImageSeeder()
 {
 	Display = 1;
+	ArrayName = "";
 }
 
 vmtkImageSeeder::~vmtkImageSeeder()
@@ -21,18 +22,40 @@ void vmtkImageSeeder::execute()
 		return;
 	}
 
-	vtkSmartPointer<vtkCellPicker> Picker = vtkSmartPointer<vtkCellPicker>::New();
+    Picker = vtkSmartPointer<vtkCellPicker>::New();
 	Picker->SetTolerance(0.005);
 
 	vtkSmartPointer<vtkAddSeedCallBack> vasc = vtkSmartPointer<vtkAddSeedCallBack>::New();
 	for(int i = 0; i < 3; i++)
 	{
-		planes[i]->AddObserver(vtkCommand::StartInteractionEvent,vasc);
+		planes[i]->AddObserver(vtkCommand::StartInteractionEvent,vasc);		
 	}
+
+	Seeds = vtkSmartPointer<vtkPolyData>::New();
+
+	InitializeSeeds();
+
+
 
 	
     
 
 }
+void vmtkImageSeeder::BuildView()
+{
+	if(ArrayName != "")
+		Image->GetPointData()->SetActiveScalars(ArrayName.c_str());
+	int* wholeExtent;
+	wholeExtent = Image->GetExtent();
 
+
+	;
+}
+void vmtkImageSeeder::InitializeSeeds()
+{
+	Seeds->Initialize();
+	vtkSmartPointer<vtkPoints> seedPoints = vtkSmartPointer<vtkPoints>::New();
+	Seeds->SetPoints(seedPoints);
+
+}
 
