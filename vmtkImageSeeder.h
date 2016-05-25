@@ -11,6 +11,9 @@
 #include <string>
 #include <vtkPointData.h>
 #include <vtkGlyph3D.h>
+#include <vtkSphereSource.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
 #include "Uncopyable.h"
 class vmtkImageSeeder:private Uncopyable
 {
@@ -31,6 +34,8 @@ private:
 
 	int Display;
 
+	int KeepSeeds;
+
     /**
 	*本类创建
 	*/
@@ -41,12 +46,22 @@ private:
 	*/
 	vtkSmartPointer<vtkPolyData> Seeds;
 
+	/**
+	*
+	*/
+	vtkSmartPointer<vtkActor> SeedActor;
 	std::string ArrayName;
 
 private:
 	void InitializeSeeds();
 
 	void BuildView();
+
+	void WidgetsOn();
+
+	void WidgetsOff();
+
+	
 
 	
 

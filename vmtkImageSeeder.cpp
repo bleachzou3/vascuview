@@ -4,6 +4,7 @@ vmtkImageSeeder::vmtkImageSeeder()
 {
 	Display = 1;
 	ArrayName = "";
+	KeepSeeds = 0;
 }
 
 vmtkImageSeeder::~vmtkImageSeeder()
@@ -34,6 +35,11 @@ void vmtkImageSeeder::execute()
 	Seeds = vtkSmartPointer<vtkPolyData>::New();
 
 	InitializeSeeds();
+	BuildView();
+	WidgetsOff();
+	if(!KeepSeeds)
+		Renderer->RemoveActor(SeedActor);
+
 
 
 
@@ -47,9 +53,33 @@ void vmtkImageSeeder::BuildView()
 		Image->GetPointData()->SetActiveScalars(ArrayName.c_str());
 	int* wholeExtent;
 	wholeExtent = Image->GetExtent();
+	for(int i = 0; i < 3; i++)
+	{
+		planes[i]->KeyPressActivationOff();
+	}
 
+	vtkSmartPointer<vtkGlyph3D> glyphs = vtkSmartPointer<vtkGlyph3D>::New();
 
-	;
+	vtkSmartPointer<vtkSphereSource> glyphSource  = vtkSmartPointer<vtkSphereSource>::New();
+
+	glyphs->SetInputData(Seeds);
+	glyphs->SetSourceConnection(glyphSource->GetOutputPort());
+	glyphs->SetScaleModeToDataScalingOff();
+	glyphs->SetScaleFactor(Image->GetLength()*0.01);
+	
+	vtkSmartPointer<vtkPolyDataMapper> glyphMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	glyphMapper->SetInputConnection(glyphs->GetOutputPort());
+
+	SeedActor = vtkSmartPointer<vtkActor>::New();
+	SeedActor->SetMapper(glyphMapper);
+
+	SeedActor->GetProperty()->SetColor(1.0,0.0,0.0);
+	Renderer->AddActor(SeedActor);
+	WidgetsOn();
+	if(Display == 1)
+		Renderer->Render();
+
+	
 }
 void vmtkImageSeeder::InitializeSeeds()
 {
@@ -57,5 +87,21 @@ void vmtkImageSeeder::InitializeSeeds()
 	vtkSmartPointer<vtkPoints> seedPoints = vtkSmartPointer<vtkPoints>::New();
 	Seeds->SetPoints(seedPoints);
 
+}
+
+void vmtkImageSeeder::WidgetsOff()
+{
+	for(int i = 0; i < 3;i++)
+	{
+		planes[i]->Off();
+	}
+}
+
+void vmtkImageSeeder::WidgetsOn()
+{
+	for(int i = 0; i < 3;i ++)
+	{
+		planes[i]->On();
+	}
 }
 
