@@ -19,11 +19,18 @@ vmtkLevelSetSegmentation::vmtkLevelSetSegmentation()
 		SmoothingConductance = 0.8;
 		NumberOfIterations = 0;
 		IsoSurfaceValue = 0.0;
+
+		levelSetTypeName = LevelSetType::GEODESIC;
+		featureImageTypeName = FeatureImageType::GRADIENT;
 }
 
 
 vmtkLevelSetSegmentation::~vmtkLevelSetSegmentation()
 {
+	if(InitializationImage)
+	{
+		InitializationImage->Delete();
+	}
 }
 
 
@@ -165,3 +172,57 @@ void vmtkLevelSetSegmentation::MergeMergeLevelSet(vtkImageData*LevelSetInput1,vt
 	LevelSetInput1->DeepCopy(minFilter->GetOutput());
 }
 
+void vmtkLevelSetSegmentation::Execute()
+{
+	log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
+	log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
+	if(Image == 0)
+	{
+		rootLog.error("Error:vmtkLevelSetSegmentation::Execute()没有图像");
+		subLog.error("Error:vmtkLevelSetSegmentation::Execute()没有图像");
+		return;
+	}
+
+	vtkSmartPointer<vtkImageCast> cast = vtkSmartPointer<vtkImageCast>::New();
+	cast->SetInputData(Image);
+	cast->SetOutputScalarTypeToFloat();
+	cast->Update();
+	Image = cast->GetOutput();
+
+	if(InitializationImage == 0)
+	{
+		InitializationImage = vtkImageData::New();
+		InitializationImage->DeepCopy(Image);
+	}
+
+	if(FeatureImage == 0)
+	{
+		FeatureImage = vtkImageData::New();
+		vmtkImageFeature* 
+		if(levelSetTypeName == LevelSetType::GEODESIC || levelSetTypeName ==  LevelSetType::LAPLACIAN)
+		{
+			switch (featureImageTypeName)
+			{
+			case VTKGRADIENT:
+				break;
+			case GRADIENT:
+				break;
+			case UPWIND:
+				break;
+			case FWHM:
+				break;
+			default:
+				break;
+			}
+		   	
+		}else if(levelSetTypeName == LevelSetType::THRESHOLD || levelSetTypeName == LevelSetType::LAPLACIAN)
+		{
+			FeatureImage->DeepCopy(Image);
+		}
+		
+	}
+
+
+
+
+}

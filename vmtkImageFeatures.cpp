@@ -185,6 +185,6 @@ void vmtkImageFeature::BuildGradientBasedFeatureImage(vtkImageData*originalData,
             boundedReciprocal->Update();
             featureImage = boundedReciprocal->GetOutput();
 		}
-		res->DeepCopy(originalData);
+		res->DeepCopy(featureImage);
 		gradientMagnitude->Delete();
 }

@@ -7,7 +7,12 @@ using namespace std;
 #include <vtkSmartPointer.h>
 #include <vtkImageGradientMagnitude.h>
 #include <vtkImageMathematics.h>
-class vmtkImageFeature
+#include "Uncopyable.h"
+enum FeatureImageType
+{
+	VTKGRADIENT,GRADIENT,UPWIND,FWHM
+};
+class vmtkImageFeature:private Uncopyable
 {
 private:
   int Dimensionality;
