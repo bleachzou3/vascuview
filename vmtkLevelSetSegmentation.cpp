@@ -198,22 +198,30 @@ void vmtkLevelSetSegmentation::Execute()
 	if(FeatureImage == 0)
 	{
 		FeatureImage = vtkImageData::New();
-		vmtkImageFeature* 
+		
 		if(levelSetTypeName == LevelSetType::GEODESIC || levelSetTypeName ==  LevelSetType::LAPLACIAN)
 		{
+			vmtkImageFeature* imageFeatures = new vmtkImageFeature;
+			
 			switch (featureImageTypeName)
 			{
 			case VTKGRADIENT:
+				imageFeatures->BuildVTKGradientBasedFeatureImage(Image,FeatureImage);
 				break;
 			case GRADIENT:
+				imageFeatures->BuildGradientBasedFeatureImage(Image,FeatureImage);
 				break;
 			case UPWIND:
+				imageFeatures->BuildUpwindGradientBasedFeatureImage(Image,FeatureImage);
 				break;
 			case FWHM:
+				imageFeatures->BuildFWHMBasedFeatureImage(Image,FeatureImage);
 				break;
 			default:
 				break;
 			}
+
+			delete imageFeatures;
 		   	
 		}else if(levelSetTypeName == LevelSetType::THRESHOLD || levelSetTypeName == LevelSetType::LAPLACIAN)
 		{
