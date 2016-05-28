@@ -15,9 +15,12 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include "Uncopyable.h"
-class vmtkImageSeeder:private Uncopyable
+class vmtkImageSeeder:public vtkObjectBase
 {
 public:
+	vtkTypeMacro(vmtkImageSeeder,vtkObjectBase);
+	static vmtkImageSeeder* New();
+protected:
 	vmtkImageSeeder();
 	~vmtkImageSeeder();
 public:

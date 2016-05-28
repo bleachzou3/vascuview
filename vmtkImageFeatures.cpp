@@ -8,6 +8,8 @@
 #include "NullPointerException.h"
 #include "vtkvmtkGradientMagnitudeRecursiveGaussianImageFilter.h"
 #include "vtkvmtkGradientMagnitudeImageFilter.h"
+#include <vtkObjectFactory.h>
+vtkStandardNewMacro(vmtkImageFeature);
 vmtkImageFeature::vmtkImageFeature()
 {
 	 Dimensionality = 3;

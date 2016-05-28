@@ -10,12 +10,16 @@
 #include <vtkImageMathematics.h>
 #include <vtkImageShiftScale.h>
 #include <vtkRenderer.h>
-class vmtkImageInitialization
+#include <vtkObjectBase.h>
+class vmtkImageInitialization:public vtkObjectBase
 {
 public:
+	vtkTypeMacro(vmtkImageInitialization,vtkObjectBase);
+	static vmtkImageInitialization* New();
+	void execute();
+protected:
 	vmtkImageInitialization();
 	~vmtkImageInitialization();
-	void execute();
 private:
 	vtkImageData*Image;
 	vtkRenderer* Renderer;

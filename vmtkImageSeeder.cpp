@@ -1,5 +1,6 @@
 #include "vmtkImageSeeder.h"
-
+#include <vtkObjectFactory.h>
+vtkStandardNewMacro(vmtkImageSeeder);
 vmtkImageSeeder::vmtkImageSeeder()
 {
 	Display = 1;

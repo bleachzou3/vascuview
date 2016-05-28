@@ -6,13 +6,14 @@
 #include <log4cpp/PropertyConfigurator.hh>
 #include <vtkImageCast.h>
 #include "vmtkImageFeature.h"
+#include "vmtkImageSeeder.h"
 
 const double unassinedThreshHold = 100000;
 enum LevelSetType
 {
 	GEODESIC,CURVES,THRESHOLD,LAPLACIAN
 };
-class vmtkLevelSetSegmentation
+class vmtkLevelSetSegmentation:public vtkObjectBase
 {
 private:
 	double FeatureDerivativeSigma;
@@ -40,15 +41,20 @@ private:
 	//InitializationImage这个类分配内存
 	vtkImageData* InitializationImage;
 
-
+	//FeatureImage这个类分配内存
 	vtkImageData* FeatureImage;
 
-public:
+	//ImageSeeder这个类分配的内存
+	vmtkImageSeeder* ImageSeeder;
 
+public:
+	static vmtkLevelSetSegmentation* New();
+	vtkTypeMacro(vmtkLevelSetSegmentation,vtkObjectBase);
 	
-	vmtkLevelSetSegmentation();
+
+protected:
+		vmtkLevelSetSegmentation();
 	virtual~vmtkLevelSetSegmentation();
-	
 	
 private:
 	/*

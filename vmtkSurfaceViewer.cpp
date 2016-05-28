@@ -11,13 +11,12 @@
 #include <vtkLabeledDataMapper.h>
 #include <vtkTextProperty.h>
 #include <vtkActor2D.h>
-vmtkSurfaceViewer::vmtkSurfaceViewer(vtkRenderer* grender)
+#include <vtkObjectFactory.h>
+vtkStandardNewMacro(vmtkSurfaceViewer);
+vmtkSurfaceViewer::vmtkSurfaceViewer()
 {
-	if(grender == 0)
-	{
-		throw NullPointerException("没有传入grender"); 
-	}
-	renderer = grender;
+
+	
 	DisplayCellData = 0;
 	ScalarRange[0] = 0.0;
 	ScalarRange[1] = 0.0;

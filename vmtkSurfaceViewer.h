@@ -9,14 +9,16 @@ using namespace std;
 #include "Uncopyable.h"
 #include <log4cpp/Category.hh>
 #include <log4cpp/PropertyConfigurator.hh>
-class vmtkSurfaceViewer:private Uncopyable 
+class vmtkSurfaceViewer:public vtkObjectBase
 {
 public:
-	vmtkSurfaceViewer(vtkRenderer* grenderer);
-	virtual ~vmtkSurfaceViewer();
+	static vmtkSurfaceViewer* New();
 	void setRenderer();
 	void buildViewWithTag();
 	void buildView();
+protected:
+	virtual ~vmtkSurfaceViewer();
+	vmtkSurfaceViewer();
 private:
 	int FlatInterpolation;
 

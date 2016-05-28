@@ -6,6 +6,8 @@
 #include "NullPointerException.h"
 #include <vtkvmtkLaplacianSegmentationLevelSetImageFilter.h>
 #include <vtkImageMathematics.h>
+#include <vtkObjectFactory.h>
+vtkStandardNewMacro(vmtkLevelSetSegmentation);
 vmtkLevelSetSegmentation::vmtkLevelSetSegmentation()
 {
 	    PropagationScaling = 0.0;
@@ -31,6 +33,9 @@ vmtkLevelSetSegmentation::~vmtkLevelSetSegmentation()
 	{
 		InitializationImage->Delete();
 	}
+
+	
+
 }
 
 
@@ -201,7 +206,7 @@ void vmtkLevelSetSegmentation::Execute()
 		
 		if(levelSetTypeName == LevelSetType::GEODESIC || levelSetTypeName ==  LevelSetType::LAPLACIAN)
 		{
-			vmtkImageFeature* imageFeatures = new vmtkImageFeature;
+			vmtkImageFeature* imageFeatures = vmtkImageFeature::New();
 			
 			switch (featureImageTypeName)
 			{
@@ -221,15 +226,26 @@ void vmtkLevelSetSegmentation::Execute()
 				break;
 			}
 
-			delete imageFeatures;
+			imageFeatures->Delete();
 		   	
 		}else if(levelSetTypeName == LevelSetType::THRESHOLD || levelSetTypeName == LevelSetType::LAPLACIAN)
 		{
 			FeatureImage->DeepCopy(Image);
+		}else
+		{
+			   rootLog.error("Unsupported LevelSetsType");
+		       subLog.error("Unsupported LevelSetsType");
 		}
+
 		
 	}
+	if( NumberOfIterations != 0)
+	{
+         
+	}
 
+
+	ImageSeeder = vmtkImageSeeder::New();
 
 
 

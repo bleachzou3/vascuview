@@ -1,5 +1,6 @@
 #include "vmtkImageInitialization.h"
-
+#include <vtkObjectFactory.h>
+vtkStandardNewMacro(vmtkImageInitialization);
 vmtkImageInitialization::vmtkImageInitialization()
 {
 	Interactive = 1;

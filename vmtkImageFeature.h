@@ -7,12 +7,13 @@ using namespace std;
 #include <vtkSmartPointer.h>
 #include <vtkImageGradientMagnitude.h>
 #include <vtkImageMathematics.h>
+#include <vtkObjectBase.h>
 #include "Uncopyable.h"
 enum FeatureImageType
 {
 	VTKGRADIENT,GRADIENT,UPWIND,FWHM
 };
-class vmtkImageFeature:private Uncopyable
+class vmtkImageFeature:public  vtkObjectBase
 {
 private:
   int Dimensionality;
@@ -22,9 +23,12 @@ private:
   int FWHMRadius[3];
   
   double FWHMBackgroundValue;
-public:
+protected:
 	vmtkImageFeature();
 	virtual ~vmtkImageFeature();
+public:
+	static vmtkImageFeature* New();
+	vtkTypeMacro(vmtkImageFeature,vtkObjectBase);
 	//originalData是原始图像,res图像是结果图像，传进来之前已经初始化，或者说已经分配内存，不是在这个函数内部分配内存
 	void BuildVTKGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res);
 
