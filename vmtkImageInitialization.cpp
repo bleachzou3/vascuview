@@ -58,8 +58,33 @@ void vmtkImageInitialization::execute()
 
 	if(Interactive)
 	{
+		bool endInitialization = false;
+		while(!endInitialization)
+		{
 
+		}
 	}
 
 		 
+}
+
+
+void vmtkImageInitialization::setRenderer(vtkRenderer*_renderer)
+{
+	Renderer = _renderer;
+}
+
+void vmtkImageInitialization::setImageSeeder(vmtkImageSeeder* _imageSeeder)
+{
+	ImageSeeder = _imageSeeder;
+}
+
+void vmtkImageInitialization::setSurfaceViewer(vmtkSurfaceViewer* _surfaceViewer)
+{
+	SurfaceViewer = _surfaceViewer;
+}
+
+void vmtkImageInitialization::setNegateImage(int _negateImage)
+{
+	NegateImage = _negateImage;
 }

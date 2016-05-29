@@ -48,6 +48,14 @@ void vmtkImageSeeder::execute()
     
 
 }
+void vmtkImageSeeder::setDisplay(int display)
+{
+	Display = display;
+}
+void vmtkImageSeeder::setRenderer(vtkRenderer* renderer)
+{
+	Renderer = renderer;
+}
 void vmtkImageSeeder::BuildView()
 {
 	if(ArrayName != "")
@@ -104,5 +112,10 @@ void vmtkImageSeeder::WidgetsOn()
 	{
 		planes[i]->On();
 	}
+}
+
+void vmtkImageSeeder::setImage(vtkImageData*_image)
+{
+	Image = _image;
 }
 

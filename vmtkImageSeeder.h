@@ -58,11 +58,19 @@ private:
 private:
 	void InitializeSeeds();
 
-	void BuildView();
+
 
 	void WidgetsOn();
 
 	void WidgetsOff();
+public:
+	void BuildView();
+
+	void setRenderer(vtkRenderer* renderer);
+
+	void setImage(vtkImageData*_image);
+
+	void setDisplay(int display);
 
 	
 

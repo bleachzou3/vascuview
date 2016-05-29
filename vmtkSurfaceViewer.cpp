@@ -414,15 +414,25 @@ void vmtkSurfaceViewer::buildViewWithTag()
 	 {
 		 renderer->Render();
 	 }
-	 
+}
 
+void vmtkSurfaceViewer::setRenderer(vtkRenderer*_renderer)
+{
+	renderer = _renderer;
+}
 
-
-
+void vmtkSurfaceViewer::setSurface(vtkPolyData*_surface)
+{
+	Surface = _surface;
 	
+}
 
+void vmtkSurfaceViewer::setDisplay(int _display)
+{
+	Display = _display;
+}
 
-
-	
-
+void vmtkSurfaceViewer::setOpacity(double _opacity)
+{
+	Opacity = _opacity;
 }

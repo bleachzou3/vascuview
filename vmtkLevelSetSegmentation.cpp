@@ -7,6 +7,9 @@
 #include <vtkvmtkLaplacianSegmentationLevelSetImageFilter.h>
 #include <vtkImageMathematics.h>
 #include <vtkObjectFactory.h>
+#include <vtkMarchingCubes.h>
+#include <vmtkImageInitialization.h>
+
 vtkStandardNewMacro(vmtkLevelSetSegmentation);
 vmtkLevelSetSegmentation::vmtkLevelSetSegmentation()
 {
@@ -22,6 +25,7 @@ vmtkLevelSetSegmentation::vmtkLevelSetSegmentation()
 		NumberOfIterations = 0;
 		IsoSurfaceValue = 0.0;
 
+		NegateForInitialization = 0;
 		levelSetTypeName = LevelSetType::GEODESIC;
 		featureImageTypeName = FeatureImageType::GRADIENT;
 }
@@ -29,11 +33,14 @@ vmtkLevelSetSegmentation::vmtkLevelSetSegmentation()
 
 vmtkLevelSetSegmentation::~vmtkLevelSetSegmentation()
 {
-	if(InitializationImage)
+	if(InitializationImage !=0 && InitializationImage->GetReferenceCount()>0)
 	{
 		InitializationImage->Delete();
 	}
-
+	if(ImageSeeder != 0 && ImageSeeder->GetReferenceCount() >0 )
+	{
+		ImageSeeder->Delete();
+	}
 	
 
 }
@@ -194,7 +201,7 @@ void vmtkLevelSetSegmentation::Execute()
 	cast->Update();
 	Image = cast->GetOutput();
 
-	if(InitializationImage == 0)
+	if(InitializationImage == 0 || InitializationImage->GetReferenceCount() < 1)
 	{
 		InitializationImage = vtkImageData::New();
 		InitializationImage->DeepCopy(Image);
@@ -246,7 +253,61 @@ void vmtkLevelSetSegmentation::Execute()
 
 
 	ImageSeeder = vmtkImageSeeder::New();
+	ImageSeeder->setRenderer(Renderer);
+	ImageSeeder->setImage(InitializationImage);
+	ImageSeeder->setDisplay(0);
+	ImageSeeder->execute();
+	ImageSeeder->BuildView();
 
+	SurfaceViewer = vmtkSurfaceViewer::New();
+
+	SurfaceViewer->setRenderer(Renderer);
+
+	if(LevelSets != 0 && LevelSets->GetReferenceCount() > 0)
+	{
+		DisplayLevelSetSurface(LevelSets,0.0);
+	}
+	
+	vii = vmtkImageInitialization::New();
+
+	vii->setImageData(InitializationImage);
+	
+	vii->setRenderer(Renderer);
+
+	vii->setImageSeeder(ImageSeeder);
+
+	vii->setSurfaceViewer(SurfaceViewer);
+
+	vii->setNegateImage(NegateForInitialization);
+
+	int endSegmentation = 0;
+
+	while(endSegmentation == 0)
+	{
+	  
+		if(InitialLevelSets == 0|| InitialLevelSets->GetReferenceCount() < 1)
+		{
+			vii->execute();
+		}
+	  
+	
+	}
+	
+
+
+}
+
+void vmtkLevelSetSegmentation::DisplayLevelSetSurface(vtkImageData*_levelSets,double _value)
+{
+	vtkSmartPointer<vtkMarchingCubes> marchingCubes = vtkSmartPointer<vtkMarchingCubes>::New();
+	marchingCubes->SetInputData(_levelSets);
+	marchingCubes->SetValue(0,_value);
+	marchingCubes->Update();
+    
+	SurfaceViewer->setSurface(marchingCubes->GetOutput());
+	SurfaceViewer->setDisplay(0);
+	SurfaceViewer->setOpacity(0.5);
+	SurfaceViewer->buildView();
 
 
 }

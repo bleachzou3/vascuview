@@ -11,6 +11,7 @@
 #include <vtkImageShiftScale.h>
 #include <vtkRenderer.h>
 #include <vtkObjectBase.h>
+
 class vmtkImageInitialization:public vtkObjectBase
 {
 public:
@@ -21,16 +22,30 @@ protected:
 	vmtkImageInitialization();
 	~vmtkImageInitialization();
 private:
+
+	//Image外面传进来
 	vtkImageData*Image;
+
+   //Image外面传进来
 	vtkRenderer* Renderer;
 	
+	//ImageSeeder外面传进来
 	vmtkImageSeeder* ImageSeeder;
+
+
+	//SurfaceViewer外面传进来
 	vmtkSurfaceViewer* SurfaceViewer;
+
+
 
 	
 	int Interactive;
 	int NegateImage;
 public:
 	void setImageData(vtkImageData*localImageData);
+	void setRenderer(vtkRenderer*_renderer);
+	void setImageSeeder(vmtkImageSeeder* _imageSeeder);
+	void setSurfaceViewer(vmtkSurfaceViewer* _surfaceViewer);
+	void setNegateImage(int _negateImage);
 };
 #endif

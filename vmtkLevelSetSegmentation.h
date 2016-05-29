@@ -7,6 +7,7 @@
 #include <vtkImageCast.h>
 #include "vmtkImageFeature.h"
 #include "vmtkImageSeeder.h"
+#include "vmtkSurfaceViewer.h"
 
 const double unassinedThreshHold = 100000;
 enum LevelSetType
@@ -34,6 +35,8 @@ private:
 	LevelSetType levelSetTypeName;
 
 	FeatureImageType featureImageTypeName;
+
+	int NegateForInitialization;
 	//外部分配
 	vtkImageData* Image;
 
@@ -46,6 +49,20 @@ private:
 
 	//ImageSeeder这个类分配的内存
 	vmtkImageSeeder* ImageSeeder;
+
+	//SurfaceViewer由这个类分配内存
+	vmtkSurfaceViewer* SurfaceViewer;
+
+	//外面传进来
+	vtkRenderer* Renderer;
+
+	//本实例分配内存
+	vtkImageData* LevelSets;
+
+	//本例分配内存
+	vmtkImageInitialization* vii;
+
+	vtkImageData* InitialLevelSets; 
 
 public:
 	static vmtkLevelSetSegmentation* New();
@@ -72,8 +89,12 @@ private:
 	*合并图像的方法,合并之后的结果放在LevelSetInput1
 	*/
 	void MergeMergeLevelSet(vtkImageData*LevelSetInput1,vtkImageData*LevelSetInput2);
+
+	void DisplayLevelSetSurface(vtkImageData*levelSets,double value = 0.0);
 public:
 	void Execute();
+
+
 
 
 	

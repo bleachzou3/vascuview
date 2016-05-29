@@ -111,6 +111,8 @@ void QtVTKRenderWindows::init3DWidget()
   int imageDims[3];
   reader->GetOutput()->GetDimensions(imageDims);
 
+
+
   //╪г╣ци╬ЁЩ
   //---------------------
   //if(planeWidget[0] != 0)
