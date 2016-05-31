@@ -1,5 +1,7 @@
 #include "vmtkImageInitialization.h"
 #include <vtkObjectFactory.h>
+#include "ChooseInitializationType.h"
+#include <vtkIdList.h>
 vtkStandardNewMacro(vmtkImageInitialization);
 vmtkImageInitialization::vmtkImageInitialization()
 {
@@ -61,13 +63,32 @@ void vmtkImageInitialization::execute()
 		bool endInitialization = false;
 		while(!endInitialization)
 		{
+			ChooseInitializationType* dialog = new ChooseInitializationType;
+			if(dialog->collidingfrontsRadioButton->isChecked())
+			{
 
+			}
 		}
 	}
 
 		 
 }
+void vmtkImageInitialization::CollidingFrontsInitialize()
+{
+	log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
+	log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
+	rootLog.info("Colliding fronts initialization.");
+	subLog.info("Colliding fronts initialization.");
 
+	vtkSmartPointer<vtkIdList> seedIds1 = vtkSmartPointer<vtkIdList>::New();
+	vtkSmartPointer<vtkIdList> seedIds2 = vtkSmartPointer<vtkIdList>::New();
+	if(Interactive)
+	{
+
+	}
+    
+
+}
 
 void vmtkImageInitialization::setRenderer(vtkRenderer*_renderer)
 {

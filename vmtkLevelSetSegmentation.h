@@ -8,7 +8,7 @@
 #include "vmtkImageFeature.h"
 #include "vmtkImageSeeder.h"
 #include "vmtkSurfaceViewer.h"
-
+#include "vmtkImageInitialization.h"
 const double unassinedThreshHold = 100000;
 enum LevelSetType
 {
