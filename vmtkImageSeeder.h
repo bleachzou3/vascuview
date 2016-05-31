@@ -56,7 +56,7 @@ private:
 	std::string ArrayName;
 
 private:
-	void InitializeSeeds();
+	
 
 
 
@@ -64,6 +64,8 @@ private:
 
 	void WidgetsOff();
 public:
+	void InitializeSeeds();
+
 	void BuildView();
 
 	void setRenderer(vtkRenderer* renderer);
@@ -71,6 +73,8 @@ public:
 	void setImage(vtkImageData*_image);
 
 	void setDisplay(int display);
+
+	vtkPolyData* getSeeds();
 
 	
 

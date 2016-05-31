@@ -2,6 +2,10 @@
 #include <vtkObjectFactory.h>
 #include "ChooseInitializationType.h"
 #include <vtkIdList.h>
+#include "ThresholdDialog.h"
+#include<qmessagebox.h>
+#include <vtkImageThreshold.h>
+#include <vtkvmtkCollidingFrontsImageFilter.h>
 vtkStandardNewMacro(vmtkImageInitialization);
 vmtkImageInitialization::vmtkImageInitialization()
 {
@@ -68,6 +72,7 @@ void vmtkImageInitialization::execute()
 			{
 
 			}
+			delete dialog;
 		}
 	}
 
@@ -84,9 +89,71 @@ void vmtkImageInitialization::CollidingFrontsInitialize()
 	vtkSmartPointer<vtkIdList> seedIds2 = vtkSmartPointer<vtkIdList>::New();
 	if(Interactive)
 	{
+		ThresholdDialog* dialog = new ThresholdDialog;
+		dialog->show();
+		QString upper = dialog->upperThresholdLine->text();
+		QString lower = dialog->lowerThresholdLine->text();
+		UpperThreshold =  upper.toDouble();
+		LowerThreshold = lower.toDouble();
+		delete dialog;
+		vtkSmartPointer<vtkPolyData> seeds = SeedInput(QString("Please place two seeds"),2);
+		seedIds1->InsertNextId(Image->FindPoint(seeds->GetPoint(0)));
+		seedIds2->InsertNextId(Image->FindPoint(seeds->GetPoint(1)));
 
+	}else
+	{
+		seedIds1->InsertNextId(Image->ComputePointId(SourcePoints));
+		seedIds2->InsertNextId(Image->ComputePointId(TargetPoints));
 	}
-    
+
+	double*scalarRange = Image->GetScalarRange();
+	vtkImageData* thresholdImage = Image;
+
+	//我的这里,和原来的py不太一样
+	vtkSmartPointer<vtkImageThreshold>  threshold = vtkSmartPointer<vtkImageThreshold>::New();
+	threshold->SetInputData(Image);
+	threshold->ThresholdBetween(std::min(LowerThreshold,UpperThreshold),std::max(LowerThreshold,UpperThreshold));    	
+	threshold->ReplaceInOff();
+	threshold->ReplaceOutOn();
+	threshold->SetOutValue(scalarRange[0]-scalarRange[1]);
+	threshold->Update();
+
+	scalarRange = threshold->GetOutput()->GetScalarRange();
+	thresholdImage = threshold->GetOutput();
+
+	double scale = 1.0;
+	if(scalarRange[1] - scalarRange[0] > 0.0)
+		scale = 1.0 /(scalarRange[0] - scalarRange[1]);
+	
+	vtkSmartPointer<vtkImageShiftScale> shiftScale = vtkSmartPointer<vtkImageShiftScale>::New();
+	shiftScale->SetInputData(thresholdImage);
+	shiftScale->SetShift(-scalarRange[0]);
+	shiftScale->SetScale(scale);
+	shiftScale->SetOutputScalarTypeToFloat();
+	shiftScale->Update();
+
+	vtkImageData* speedImage = shiftScale->GetOutput();
+
+	vtkSmartPointer<vtkvmtkCollidingFrontsImageFilter> collidingFronts = vtkSmartPointer<vtkvmtkCollidingFrontsImageFilter>::New();
+
+	collidingFronts->SetInputData(speedImage);
+	collidingFronts->SetSeeds1(seedIds1);
+	collidingFronts->SetSeeds2(seedIds2);
+	collidingFronts->ApplyConnectivityOn();
+	collidingFronts->StopOnTargetsOn();
+	collidingFronts->Update();
+
+	vtkSmartPointer<vtkImageMathematics> subtract = vtkSmartPointer<vtkImageMathematics>::New();
+	subtract->SetInputConnection(collidingFronts->GetOutputPort());
+	subtract->SetOperationToAddConstant();
+	subtract->SetConstantC(-10.0*collidingFronts->GetNegativeEpsilon());
+	subtract->Update();
+
+	vtkImageData* InitialLevelSets = vtkImageData::New();
+	InitialLevelSets->DeepCopy(subtract->GetOutput());
+
+	IsoSurfaceValue = 0.0;
+
 
 }
 
@@ -108,4 +175,31 @@ void vmtkImageInitialization::setSurfaceViewer(vmtkSurfaceViewer* _surfaceViewer
 void vmtkImageInitialization::setNegateImage(int _negateImage)
 {
 	NegateImage = _negateImage;
+}
+
+vtkSmartPointer<vtkPolyData> vmtkImageInitialization::SeedInput(const QString & message,int NumberOfSeeds)
+{
+	int invalid = 1;
+	while(invalid)
+	{
+		invalid = 0;
+		QMessageBox messageDialog(QMessageBox::Warning,"Information",message+"(click on the image while pressing Ctrl).\n",QMessageBox::Ok,NULL);
+		ImageSeeder->InitializeSeeds();
+		Renderer->Render();
+		if(NumberOfSeeds > 0 )
+		{
+			if(ImageSeeder->getSeeds()->GetNumberOfPoints() != NumberOfSeeds)
+			{
+			  QMessageBox messageDialog(QMessageBox::Warning,"Information","Invalid selection. Please place exactly "+QString(NumberOfSeeds)+"seeds.\n",QMessageBox::Ok,NULL); 
+			  invalid = 1;
+			  continue;
+			}
+		
+		}
+	
+	}
+	vtkSmartPointer<vtkPolyData> seeds = vtkSmartPointer<vtkPolyData>::New();
+	seeds->DeepCopy(ImageSeeder->getSeeds());
+	return seeds;
+
 }

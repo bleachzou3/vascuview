@@ -141,15 +141,15 @@ endif()
 
 # Set your files and resources here
 set( Srcs QtVTKRenderWindowsApp.cxx QtVTKRenderWindows.cxx VascuviewUtility.cpp vmtkImageFeatures.cpp vmtkLevelSetSegmentation.cpp
-  vmtkSurfaceViewer.cpp vmtkImageInitialization.cpp vmtkImageSeeder.cpp)
+  vmtkSurfaceViewer.cpp vmtkImageInitialization.cpp vmtkImageSeeder.cpp ChooseInitializationType.cpp ThresholdDialog.cpp)
 
 set( Hdrs QtVTKRenderWindows.h VascuviewUtility.h vtkResliceCursorCallback.h vtkUpdateCubeCallback.h vtkHideCubeCallback.h NullPointerException.h
    vmtkImageFeature.h vmtkLevelSetSegmentation.h vtkAddSeedCallBack.h vmtkSurfaceViewer.h vmtkImageSeeder.h vmtkImageInitialization.h
-  Uncopyable.h )
+  Uncopyable.h ChooseInitializationType.h ThresholdDialog.h )
 
 set( MOC_Hdrs QtVTKRenderWindows.h )
 
-set( UIs QtVTKRenderWindows.ui )
+set( UIs QtVTKRenderWindows.ui ChooseInitializationType.ui YNDialog.ui Threshold.ui)
 #加入log4cpp配置文件
 set( LOGs log4cpp.conf )
 

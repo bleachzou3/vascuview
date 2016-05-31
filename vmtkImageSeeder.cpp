@@ -1,6 +1,11 @@
 #include "vmtkImageSeeder.h"
 #include <vtkObjectFactory.h>
 vtkStandardNewMacro(vmtkImageSeeder);
+
+vtkPolyData* vmtkImageSeeder::getSeeds()
+{
+	return Seeds;
+}
 vmtkImageSeeder::vmtkImageSeeder()
 {
 	Display = 1;
