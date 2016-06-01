@@ -12,6 +12,7 @@
 #include <vtkRenderer.h>
 #include <vtkObjectBase.h>
 #include <qstring.h>
+#include <vtkMarchingCubes.h>
 class vmtkImageInitialization:public vtkObjectBase
 {
 public:
@@ -23,6 +24,8 @@ protected:
 	vmtkImageInitialization();
 	~vmtkImageInitialization();
 private:
+	//本类创建
+	vtkPolyData*Surface;
 
 	//Image外面传进来
 	vtkImageData*Image;
@@ -39,6 +42,10 @@ private:
 
 	//本类创建
 	vtkImageData* InitialLevelSets;
+
+
+	//本类创建的内存
+	vtkImageData*MergedInitialLevelSets;
 
 	double IsoSurfaceValue;
 
@@ -58,8 +65,11 @@ public:
 	void setSurfaceViewer(vmtkSurfaceViewer* _surfaceViewer);
 	void setNegateImage(int _negateImage);
 	void CollidingFrontsInitialize();
+	void MergeLevelSets();
 private:
 	vtkSmartPointer<vtkPolyData> SeedInput(const QString & message,int numberOfSeeds);
+
+	void DisplayLevelSetSurface(vtkImageData*levelSets);
 	
 };
 #endif

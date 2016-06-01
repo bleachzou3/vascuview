@@ -6,6 +6,7 @@
 #include<qmessagebox.h>
 #include <vtkImageThreshold.h>
 #include <vtkvmtkCollidingFrontsImageFilter.h>
+#include <YNDialog.h>
 vtkStandardNewMacro(vmtkImageInitialization);
 vmtkImageInitialization::vmtkImageInitialization()
 {
@@ -68,11 +69,26 @@ void vmtkImageInitialization::execute()
 		while(!endInitialization)
 		{
 			ChooseInitializationType* dialog = new ChooseInitializationType;
+
+			//这里到时候要加代码
+			/*
 			if(dialog->collidingfrontsRadioButton->isChecked())
 			{
+			   CollidingFrontsInitialize();
+			}*/
 
-			}
+
+			CollidingFrontsInitialize();
 			delete dialog;
+
+			//询问用户接不接收当前的初始化结果
+			YNDialog* accept = new YNDialog;
+			accept->setMessage("Accept initialization? (y/n)");
+			if(accept->YRadioButton->isChecked())
+			{
+				MergeLevelSets();
+			}
+
 		}
 	}
 
@@ -201,5 +217,56 @@ vtkSmartPointer<vtkPolyData> vmtkImageInitialization::SeedInput(const QString & 
 	vtkSmartPointer<vtkPolyData> seeds = vtkSmartPointer<vtkPolyData>::New();
 	seeds->DeepCopy(ImageSeeder->getSeeds());
 	return seeds;
+
+}
+
+void vmtkImageInitialization::MergeLevelSets()
+{
+	if(MergedInitialLevelSets == 0&& MergedInitialLevelSets->GetReferenceCount()<1)
+	{
+		MergedInitialLevelSets = vtkImageData::New();
+		MergedInitialLevelSets->DeepCopy(InitialLevelSets); 
+	}else
+	{
+		vtkSmartPointer<vtkImageMathematics> minFilter = vtkSmartPointer<vtkImageMathematics>::New();
+		minFilter->SetOperationToMin();
+		minFilter->SetInput1Data(MergedInitialLevelSets);
+		minFilter->SetInput2Data(InitialLevelSets);
+		minFilter->Update();
+
+		vtkImageData* tempMergedInitialLevelSets = MergedInitialLevelSets;
+
+		//这里要重新分配内存，是因为 minFilter离开作用域就失效了
+		MergedInitialLevelSets = vtkImageData::New();
+		MergedInitialLevelSets->DeepCopy(minFilter->GetOutput());
+
+		//把原先的删除
+		tempMergedInitialLevelSets->Delete();
+
+	}
+}
+
+void vmtkImageInitialization::DisplayLevelSetSurface(vtkImageData* levelSets)
+{
+	double value = 0.0;
+	vtkSmartPointer<vtkMarchingCubes> marchingCubes = vtkSmartPointer<vtkMarchingCubes>::New();
+	marchingCubes->SetInputData(levelSets);
+	marchingCubes->SetValue(0,value);
+	marchingCubes->Update();
+
+	if(Surface != 0 || Surface->GetReferenceCount() > 0)
+		Surface->Delete();
+
+	Surface = vtkPolyData::New();
+	Surface->DeepCopy(marchingCubes->GetOutput());
+
+
+	SurfaceViewer->setSurface(marchingCubes->GetOutput());
+	SurfaceViewer->setDisplay(0);
+	SurfaceViewer->setOpacity(0.5);
+
+	SurfaceViewer->buildView();
+	
+
 
 }
