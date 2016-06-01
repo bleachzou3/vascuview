@@ -13,12 +13,17 @@
 #include <vtkObjectBase.h>
 #include <qstring.h>
 #include <vtkMarchingCubes.h>
+enum ImageInitializationType
+{
+	COLLIDINGFRONTS,FASTMARCHING,THRESHOLD,ISOSURFACE,SEEDS
+};
 class vmtkImageInitialization:public vtkObjectBase
 {
 public:
 	vtkTypeMacro(vmtkImageInitialization,vtkObjectBase);
 	static vmtkImageInitialization* New();
 	void execute();
+
 
 protected:
 	vmtkImageInitialization();
@@ -58,6 +63,8 @@ private:
 
 	double LowerThreshold;
 	double UpperThreshold;
+
+	ImageInitializationType Method;
 public:
 	void setImageData(vtkImageData*localImageData);
 	void setRenderer(vtkRenderer*_renderer);
@@ -66,6 +73,10 @@ public:
 	void setNegateImage(int _negateImage);
 	void CollidingFrontsInitialize();
 	void MergeLevelSets();
+
+	vtkImageData* getInitialLevelSets();
+
+	void setInitialLevelSets(vtkImageData* _image);
 private:
 	vtkSmartPointer<vtkPolyData> SeedInput(const QString & message,int numberOfSeeds);
 

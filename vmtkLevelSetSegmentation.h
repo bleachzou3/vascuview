@@ -62,7 +62,10 @@ private:
 	//本例分配内存
 	vmtkImageInitialization* vii;
 
-	vtkImageData* InitialLevelSets; 
+	vtkImageData* InitialLevelSets;
+
+	//这个类是没有内存的
+	vtkImageData*LevelSetsInput;
 
 public:
 	static vmtkLevelSetSegmentation* New();

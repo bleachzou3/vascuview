@@ -288,8 +288,20 @@ void vmtkLevelSetSegmentation::Execute()
 		if(InitialLevelSets == 0|| InitialLevelSets->GetReferenceCount() < 1)
 		{
 			vii->execute();
+			LevelSetsInput = vii->getInitialLevelSets();
+			vii->setInitialLevelSets(0);
+		}else
+		{
+			LevelSetsInput = InitialLevelSets;
+			InitialLevelSets = 0;
+			DisplayLevelSetSurface(LevelSetsInput,IsoSurfaceValue);
 		}
-	  
+	    
+		bool endEvolution = false;
+		while(!endEvolution)
+		{
+		  
+		}
 	
 	}
 	

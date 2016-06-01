@@ -16,7 +16,15 @@ vmtkImageInitialization::vmtkImageInitialization()
 
 vmtkImageInitialization::~vmtkImageInitialization()
 {
-
+	if(MergedInitialLevelSets != 0 && MergedInitialLevelSets->GetReferenceCount()>0)
+	{
+		MergedInitialLevelSets->Delete();
+	 
+	}
+	if(InitialLevelSets != 0 &&InitialLevelSets->GetReferenceCount() > 0)
+	{
+		InitialLevelSets->Delete();
+	}
 }
 
 void vmtkImageInitialization::setImageData(vtkImageData* localImageData)
@@ -69,7 +77,7 @@ void vmtkImageInitialization::execute()
 		while(!endInitialization)
 		{
 			ChooseInitializationType* dialog = new ChooseInitializationType;
-
+			dialog->show();
 			//这里到时候要加代码
 			/*
 			if(dialog->collidingfrontsRadioButton->isChecked())
@@ -84,12 +92,34 @@ void vmtkImageInitialization::execute()
 			//询问用户接不接收当前的初始化结果
 			YNDialog* accept = new YNDialog;
 			accept->setMessage("Accept initialization? (y/n)");
+			accept->show();
 			if(accept->YRadioButton->isChecked())
 			{
 				MergeLevelSets();
+				DisplayLevelSetSurface(MergedInitialLevelSets);
+			}
+			accept->setMessage("Initialize another branch? (y/n):");
+			accept->show();
+			if(accept->YRadioButton->isChecked())
+			{
+				endInitialization = false;
+			}else
+			{
+				endInitialization = true;
 			}
 
 		}
+		InitialLevelSets = MergedInitialLevelSets;
+		MergedInitialLevelSets = 0;
+	}else
+	{ 
+		//其他几种初始化方法还没选
+		if(Method == ImageInitializationType::COLLIDINGFRONTS)
+		{
+			CollidingFrontsInitialize();
+		}
+
+		//CollidingFrontsInitialize();
 	}
 
 		 
@@ -164,11 +194,15 @@ void vmtkImageInitialization::CollidingFrontsInitialize()
 	subtract->SetOperationToAddConstant();
 	subtract->SetConstantC(-10.0*collidingFronts->GetNegativeEpsilon());
 	subtract->Update();
+	if(InitialLevelSets != 0&&InitialLevelSets->GetReferenceCount()>0)
+		InitialLevelSets->Delete();
 
 	vtkImageData* InitialLevelSets = vtkImageData::New();
 	InitialLevelSets->DeepCopy(subtract->GetOutput());
 
 	IsoSurfaceValue = 0.0;
+	rootLog.info("Colliding fronts initialization complete");
+	subLog.info("Colliding fronts initialization complete");
 
 
 }
@@ -269,4 +303,14 @@ void vmtkImageInitialization::DisplayLevelSetSurface(vtkImageData* levelSets)
 	
 
 
+}
+
+void vmtkImageInitialization::setInitialLevelSets(vtkImageData*_image)
+{
+	InitialLevelSets = _image;
+
+}
+vtkImageData* vmtkImageInitialization::getInitialLevelSets()
+{
+	return InitialLevelSets;
 }
