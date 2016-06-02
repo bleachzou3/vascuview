@@ -9,7 +9,7 @@
 #include <vtkObjectFactory.h>
 #include <vtkMarchingCubes.h>
 #include <vmtkImageInitialization.h>
-
+#include "LevelSetDialog.h"
 vtkStandardNewMacro(vmtkLevelSetSegmentation);
 vmtkLevelSetSegmentation::vmtkLevelSetSegmentation()
 {
@@ -47,11 +47,15 @@ vmtkLevelSetSegmentation::~vmtkLevelSetSegmentation()
 
 
 
-void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC(vtkImageData*FeatureImage,vtkImageData*LevelSetsInput,vtkImageData*LevelSetsOutput)
-{
-		if(FeatureImage == 0|| LevelSetsInput == 0||LevelSetsOutput == 0)
+void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC()
+{      
+	    log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
+	    log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
+		if(FeatureImage == 0|| LevelSetsInput == 0||LevelSetsOutput == 0||
+			FeatureImage->GetReferenceCount()< 1 || LevelSetsInput->GetReferenceCount() < 1|| LevelSetsOutput->GetReferenceCount() < 1)
 		{
-		    throw NullPointerException(":LevelSetEvolutionGEODESIC(vtkImageData*FeatureImage,vtkImageData*LevelSetsInput,vtkImageData*LevelSetsOutput):3个参数必须已经分配内存");
+		    
+			rootLog.info("void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC() FeatureImage")
 		}
 		vtkSmartPointer<vtkvmtkGeodesicActiveContourLevelSetImageFilter> levelSetsG = vtkSmartPointer<vtkvmtkGeodesicActiveContourLevelSetImageFilter>::New();	
 		levelSetsG->SetFeatureImage(FeatureImage);
@@ -70,7 +74,10 @@ void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC(vtkImageData*FeatureIma
         levelSetsG->SetInterpolateSurfaceLocation(1);		
         levelSetsG->SetUseImageSpacing(1);
 		levelSetsG->Update();
+		if(LevelSetsOutput != 0 && LevelSetsOutput->GetReferenceCount()>0)
+			LevelSetsOutput->Delete();
 
+		LevelSetsOutput = vtkImageData::New();
 		LevelSetsOutput->DeepCopy(levelSetsG->GetOutput());
 	
 }
@@ -300,7 +307,43 @@ void vmtkLevelSetSegmentation::Execute()
 		bool endEvolution = false;
 		while(!endEvolution)
 		{
-		  
+			LevelSetDialog * levelSetDialog = new LevelSetDialog;
+			levelSetDialog->show();
+			if(levelSetDialog->ExitRadioButton->isChecked())
+			{
+				return;
+			}else if(levelSetDialog->AcceptRadioButton->isChecked())
+			{
+				endEvolution = true;
+			}else{
+			    try
+				{
+					NumberOfIterations = levelSetDialog->NumberOfIterationsLineEdit->text().toInt();
+					PropagationScaling = levelSetDialog->PropagationScalingLineEdit->text().toDouble();
+					CurvatureScaling = levelSetDialog->CurvatureScalingLineEdit->text().toDouble();
+					AdvectionScaling = levelSetDialog->AdvectionScalingLineEdit->text().toDouble();
+				}catch(exception e)
+				{
+					rootLog.error("void vmtkLevelSetSegmentation::Execute() wrong parameter");
+		            subLog.error("void vmtkLevelSetSegmentation::Execute() wrong parameter"); 
+					continue;
+				}
+			}
+			if(endEvolution)
+				break;
+			switch (levelSetTypeName)
+			{
+			case GEODESIC:
+				break;
+			case CURVES:
+				break;
+			case THRESHOLD:
+				break;
+			case LAPLACIAN:
+				break;
+			default:
+				break;
+			}
 		}
 	
 	}

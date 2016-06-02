@@ -64,8 +64,11 @@ private:
 
 	vtkImageData* InitialLevelSets;
 
-	//这个类是没有内存的
+	//这个类从其它地方获得，或者说获得其它地方引用
 	vtkImageData*LevelSetsInput;
+
+	//这个类分配的内存
+	vtkImageData*LevelSetsOutput;
 
 public:
 	static vmtkLevelSetSegmentation* New();
@@ -80,7 +83,7 @@ private:
 	/*
 	  以下的四个方法图像指针都不能为空
 	*/
-    void LevelSetEvolutionGEODESIC(vtkImageData*FeatureImage,vtkImageData*LevelSetsInput,vtkImageData*LevelSetsOutput);
+    void LevelSetEvolutionGEODESIC();
 
 	void LevelSetEvolutionCURVES(vtkImageData*FeatureImage,vtkImageData*LevelSetsInput,vtkImageData*LevelSetsOutput);
 

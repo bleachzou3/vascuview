@@ -15,7 +15,7 @@
 #include <vtkMarchingCubes.h>
 enum ImageInitializationType
 {
-	COLLIDINGFRONTS,FASTMARCHING,THRESHOLD,ISOSURFACE,SEEDS
+	COLLIDINGFRONTS,FASTMARCHING,THRESHOLDI,ISOSURFACE,SEEDS
 };
 class vmtkImageInitialization:public vtkObjectBase
 {
