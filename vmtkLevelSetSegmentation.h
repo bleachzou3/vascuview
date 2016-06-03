@@ -94,7 +94,7 @@ private:
 	/*
 	*合并图像的方法,合并之后的结果放在LevelSetInput1
 	*/
-	void MergeMergeLevelSet(vtkImageData*LevelSetInput1,vtkImageData*LevelSetInput2);
+	void MergeLevelSet();
 
 	void DisplayLevelSetSurface(vtkImageData*levelSets,double value = 0.0);
 public:

@@ -10,6 +10,8 @@
 #include <vtkMarchingCubes.h>
 #include <vmtkImageInitialization.h>
 #include "LevelSetDialog.h"
+#include "ThresholdDialog.h"
+#include "YNDialog.h"
 vtkStandardNewMacro(vmtkLevelSetSegmentation);
 vmtkLevelSetSegmentation::vmtkLevelSetSegmentation()
 {
@@ -41,7 +43,23 @@ vmtkLevelSetSegmentation::~vmtkLevelSetSegmentation()
 	{
 		ImageSeeder->Delete();
 	}
+	if(FeatureImage != 0 && FeatureImage->GetReferenceCount() > 0)
+	{
+		FeatureImage->Delete();
+	}
+	if(SurfaceViewer != 0 && SurfaceViewer->GetReferenceCount() > 0 )
+	{
+		SurfaceViewer->Delete();
+	}
+	if(LevelSets != 0 && LevelSets->GetReferenceCount() > 0)
+	{
+		LevelSets->Delete();
 	
+	}
+	if(LevelSetsOutput != 0&& LevelSetsOutput->GetReferenceCount() > 0)
+	{
+		LevelSetsOutput->Delete();
+	}
 
 }
 
@@ -202,18 +220,39 @@ void vmtkLevelSetSegmentation::LevelSetEvolutionLAPLACIAN()
 			LevelSetsOutput->DeepCopy(levelSetsL->GetOutput());
 }
 
-void vmtkLevelSetSegmentation::MergeMergeLevelSet(vtkImageData*LevelSetInput1,vtkImageData*LevelSetInput2)
+void vmtkLevelSetSegmentation::MergeLevelSet()
 {
-	if(LevelSetInput1 == 0|| LevelSetInput2 == 0)
+	log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
+	log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
+	if(LevelSetsOutput == 0 || LevelSetsOutput->GetReferenceCount() < 1)
 	{
-		throw NullPointerException("输入图像参数不能为空指针");
+		rootLog.error("void vmtkLevelSetSegmentation::MergeLevelSet() LevelSetsOutput is invalid");
+		subLog.error("void vmtkLevelSetSegmentation::MergeLevelSet() LevelSetsOutput is invalid");
+		return;
 	}
-	vtkSmartPointer<vtkImageMathematics> minFilter = vtkSmartPointer<vtkImageMathematics>::New();
-	minFilter->SetOperationToMin();
-	minFilter->SetInput1Data(LevelSetInput1);
-	minFilter->SetInput2Data(LevelSetInput2);
-	minFilter->Update();
-	LevelSetInput1->DeepCopy(minFilter->GetOutput());
+    
+
+	if(LevelSets == 0 || LevelSets->GetReferenceCount() < 1)
+	{
+		LevelSets = vtkImageData::New();
+		LevelSets->DeepCopy(LevelSetsOutput);
+	}else
+	{
+		vtkSmartPointer<vtkImageMathematics> minFilter = vtkSmartPointer<vtkImageMathematics>::New();
+		minFilter->SetOperationToMin();
+		minFilter->SetInput1Data(LevelSets);
+		minFilter->SetInput2Data(LevelSetsOutput);
+		minFilter->Update();
+		vtkImageData* tempLevelSets = LevelSets;
+
+
+		LevelSets = vtkImageData::New();
+		LevelSets->DeepCopy(minFilter->GetOutput());
+		tempLevelSets->Delete();
+	}
+
+
+	
 }
 
 void vmtkLevelSetSegmentation::Execute()
@@ -354,21 +393,70 @@ void vmtkLevelSetSegmentation::Execute()
 					continue;
 				}
 			}
+			delete levelSetDialog;
 			if(endEvolution)
 				break;
+
 			switch (levelSetTypeName)
 			{
 			case GEODESIC:
+				LevelSetEvolutionGEODESIC();
 				break;
 			case CURVES:
+				LevelSetEvolutionCURVES();
 				break;
 			case THRESHOLD:
+			{
+				ThresholdDialog* thresholdDialog = new ThresholdDialog;
+				thresholdDialog->show();
+				double upperThreshold = thresholdDialog->upperThresholdLine->text().toDouble();
+				double lowerThreshold = thresholdDialog->lowerThresholdLine->text().toDouble();
+				delete thresholdDialog;
+				LevelSetEvolutionTHRESHOLD(upperThreshold,lowerThreshold);
 				break;
+			}
 			case LAPLACIAN:
+				LevelSetEvolutionLAPLACIAN();
 				break;
 			default:
 				break;
 			}
+			DisplayLevelSetSurface(LevelSetsOutput);
+			YNDialog *yndialog = new YNDialog;
+			yndialog->setMessage("Accept result? (y/n):");
+			if(yndialog->YRadioButton->isChecked())
+			{
+				endEvolution = true;
+			}else
+			{
+				endEvolution = false;
+			}
+			delete yndialog;
+			
+		}
+
+		YNDialog* yndialog = new YNDialog;
+		yndialog->setMessage("Merge branch? (y/n):");
+		if(yndialog->YRadioButton->isChecked())
+		{
+			MergeLevelSet();
+		}else
+		{
+			delete yndialog;
+			continue;
+		}
+		delete yndialog;
+
+		if(LevelSets != 0&&LevelSets->GetReferenceCount()>0)
+			DisplayLevelSetSurface(LevelSets);
+		YNDialog* segBranch = new YNDialog;
+		segBranch->setMessage("Segment another branch? (y/n):");
+		if(segBranch->YRadioButton->isChecked())
+		{
+			endSegmentation = false;
+		}else
+		{
+			endSegmentation = true;
 		}
 	
 	}
