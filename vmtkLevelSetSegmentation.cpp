@@ -51,11 +51,12 @@ void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC()
 {      
 	    log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
 	    log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
-		if(FeatureImage == 0|| LevelSetsInput == 0||LevelSetsOutput == 0||
-			FeatureImage->GetReferenceCount()< 1 || LevelSetsInput->GetReferenceCount() < 1|| LevelSetsOutput->GetReferenceCount() < 1)
+		if(FeatureImage == 0|| LevelSetsInput == 0||
+			FeatureImage->GetReferenceCount()< 1 || LevelSetsInput->GetReferenceCount() < 1)
 		{
-		    
-			rootLog.info("void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC() FeatureImage")
+			subLog.info("void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC() FeatureImage,LevelSetsInput,Invalid");
+			rootLog.info("void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC() FeatureImage,LevelSetsInput,Invalid");
+			return;
 		}
 		vtkSmartPointer<vtkvmtkGeodesicActiveContourLevelSetImageFilter> levelSetsG = vtkSmartPointer<vtkvmtkGeodesicActiveContourLevelSetImageFilter>::New();	
 		levelSetsG->SetFeatureImage(FeatureImage);
@@ -82,11 +83,16 @@ void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC()
 	
 }
 
-void vmtkLevelSetSegmentation::LevelSetEvolutionCURVES(vtkImageData*FeatureImage,vtkImageData*LevelSetsInput,vtkImageData*LevelSetsOutput)
+void vmtkLevelSetSegmentation::LevelSetEvolutionCURVES()
 {
-		if(FeatureImage == 0|| LevelSetsInput == 0||LevelSetsOutput == 0)
+		if(FeatureImage == 0|| LevelSetsInput == 0||
+			FeatureImage->GetReferenceCount()< 1 || LevelSetsInput->GetReferenceCount() < 1)
 		{
-		    throw NullPointerException(":LevelSetEvolutionCURVES(vtkImageData*FeatureImage,vtkImageData*LevelSetsInput,vtkImageData*LevelSetsOutput):3个参数必须已经分配内存");
+		    log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
+	        log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
+			subLog.info("void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC() FeatureImage,LevelSetsInput,Invalid");
+			rootLog.info("void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC() FeatureImage,LevelSetsInput,Invalid");
+			return;
 		}
 		vtkSmartPointer<vtkvmtkCurvesLevelSetImageFilter>levelSetsC = vtkSmartPointer<vtkvmtkCurvesLevelSetImageFilter>::New();
 		levelSetsC->SetFeatureImage(FeatureImage);
@@ -104,21 +110,29 @@ void vmtkLevelSetSegmentation::LevelSetEvolutionCURVES(vtkImageData*FeatureImage
         levelSetsC->SetInterpolateSurfaceLocation(1);		
         levelSetsC->SetUseImageSpacing(1);
 		levelSetsC->Update();
+		if(LevelSetsOutput != 0 && LevelSetsOutput->GetReferenceCount()>0)
+		           LevelSetsOutput->Delete();
 
+		LevelSetsOutput = vtkImageData::New();
 		LevelSetsOutput->DeepCopy(levelSetsC->GetOutput());
 }
 
-void vmtkLevelSetSegmentation::LevelSetEvolutionTHRESHOLD(vtkImageData*originalImage,vtkImageData*LevelSetsInput,vtkImageData*LevelSetsOutput,double UpperThreshold ,double LowerThreshold)
+void vmtkLevelSetSegmentation::LevelSetEvolutionTHRESHOLD(double UpperThreshold ,double LowerThreshold)
 {
-		if(originalImage == 0|| LevelSetsInput == 0||LevelSetsOutput == 0)
-		{
-		    throw NullPointerException("void vmtkLevelSetSegmentation::LevelSetEvolutionTHRESHOLD(vtkImageData*originalImage,vtkImageData*LevelSetsInput,vtkImageData*LevelSetsOutput,double UpperThreshold ,double LowerThreshold):前面3个参数必须已经分配内存");
-		}
+			if(Image == 0|| LevelSetsInput == 0||
+				Image->GetReferenceCount()< 1 || LevelSetsInput->GetReferenceCount() < 1)
+			{
+				log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
+				log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
+				subLog.info("void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC() Image,LevelSetsInput,Invalid");
+				rootLog.info("void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC() Image,LevelSetsInput,Invalid");
+				return;
+			}
 		vtkSmartPointer<vtkvmtkThresholdSegmentationLevelSetImageFilter> levelSetsT = vtkSmartPointer<vtkvmtkThresholdSegmentationLevelSetImageFilter>::New();
 		 
-		 levelSetsT->SetFeatureImage(originalImage);
+		levelSetsT->SetFeatureImage(Image);
 
-		double*scalarRange =  originalImage->GetScalarRange();
+		double*scalarRange =  Image->GetScalarRange();
 		 
 		if (LowerThreshold != unassinedThreshHold)
 		{
@@ -150,19 +164,27 @@ void vmtkLevelSetSegmentation::LevelSetEvolutionTHRESHOLD(vtkImageData*originalI
         levelSetsT->SetInterpolateSurfaceLocation(1);		
         levelSetsT->SetUseImageSpacing(1);
 		levelSetsT->Update();
+		if(LevelSetsOutput != 0 && LevelSetsOutput->GetReferenceCount()>0)
+				LevelSetsOutput->Delete();
 
+		LevelSetsOutput = vtkImageData::New();
 		LevelSetsOutput->DeepCopy(levelSetsT->GetOutput());
 
 }
 
-void vmtkLevelSetSegmentation::LevelSetEvolutionLAPLACIAN(vtkImageData*originalImage,vtkImageData*LevelSetsInput,vtkImageData*LevelSetsOutput)
+void vmtkLevelSetSegmentation::LevelSetEvolutionLAPLACIAN()
 {
-			if(originalImage == 0|| LevelSetsInput == 0||LevelSetsOutput == 0)
+			if(Image == 0|| LevelSetsInput == 0||
+				Image->GetReferenceCount()< 1 || LevelSetsInput->GetReferenceCount() < 1)
 			{
-			throw NullPointerException("void vmtkLevelSetSegmentation::LevelSetEvolutionLAPLACIAN(vtkImageData*originalImage,vtkImageData*LevelSetsInput,vtkImageData*LevelSetsOutput):前面3个参数必须已经分配内存");
+				log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
+				log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
+				subLog.info("void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC() Image,LevelSetsInput,Invalid");
+				rootLog.info("void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC() Image,LevelSetsInput,Invalid");
+				return;
 			}
 			vtkSmartPointer<vtkvmtkLaplacianSegmentationLevelSetImageFilter>levelSetsL = vtkvmtkLaplacianSegmentationLevelSetImageFilter::New();
-			levelSetsL->SetFeatureImage(originalImage);
+			levelSetsL->SetFeatureImage(Image);
 			levelSetsL->SetPropagationScaling(-PropagationScaling);
 			levelSetsL->SetCurvatureScaling(CurvatureScaling);
 
@@ -173,7 +195,10 @@ void vmtkLevelSetSegmentation::LevelSetEvolutionLAPLACIAN(vtkImageData*originalI
 			levelSetsL->SetInterpolateSurfaceLocation(1);		
 			levelSetsL->SetUseImageSpacing(1);
 			levelSetsL->Update();
+			if(LevelSetsOutput != 0 && LevelSetsOutput->GetReferenceCount()>0)
+		          LevelSetsOutput->Delete();
 
+		    LevelSetsOutput = vtkImageData::New();
 			LevelSetsOutput->DeepCopy(levelSetsL->GetOutput());
 }
 

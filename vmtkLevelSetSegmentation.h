@@ -85,11 +85,11 @@ private:
 	*/
     void LevelSetEvolutionGEODESIC();
 
-	void LevelSetEvolutionCURVES(vtkImageData*FeatureImage,vtkImageData*LevelSetsInput,vtkImageData*LevelSetsOutput);
+	void LevelSetEvolutionCURVES();
 
-	void LevelSetEvolutionTHRESHOLD(vtkImageData*originalImage,vtkImageData*LevelSetsInput,vtkImageData*LevelSetsOutput,double UpperThreshold = unassinedThreshHold,double LowerThreshold = unassinedThreshHold);
+	void LevelSetEvolutionTHRESHOLD(double UpperThreshold = unassinedThreshHold,double LowerThreshold = unassinedThreshHold);
 
-	void LevelSetEvolutionLAPLACIAN(vtkImageData*originalImage,vtkImageData*LevelSetsInput,vtkImageData*LevelSetsOutput);
+	void LevelSetEvolutionLAPLACIAN();
 
 	/*
 	*合并图像的方法,合并之后的结果放在LevelSetInput1
