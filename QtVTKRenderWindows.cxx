@@ -38,6 +38,7 @@
 #include "VascuviewUtility.h"
 #include "vtkXMLImageDataWriter.h"
 #include "vtkDataObject.h"
+#include "vmtkLevelSetSegmentation.h"
 //----------------------------------------------------------------------------
 
 
@@ -89,7 +90,7 @@ void QtVTKRenderWindows::init3DWidget()
 		return;
 	}
 	flag = true;
-	readerFlag = 0;
+	readerFlag = CurrentReaderType::DICOMREADER;
 	this->ui->statusBar->showMessage(directory);
 	
 
@@ -411,13 +412,13 @@ void QtVTKRenderWindows::IsShowBoxWidget(bool visible)
 	if(visible)
 	{
 		boxWidgetOn = true;
-
+		
 		boxWidget->SetPriority(2);
 		boxWidget->SetHandleSize(5E-3);
-		if(readerFlag == 0)
+		if(readerFlag == CurrentReaderType::DICOMREADER)
 		{
 		  boxWidget->SetInputConnection(reader->GetOutputPort());
-		}else if(readerFlag == 1)
+		}else if(readerFlag == CurrentReaderType::VTIREADER)
 		{
 		   boxWidget->SetInputConnection(readerVti->GetOutputPort());
 		}
@@ -537,10 +538,10 @@ void QtVTKRenderWindows::croppedImageActivity()
 
 	vtkSmartPointer<vtkImageData> croppedImageData = vtkSmartPointer<vtkImageData>::New();
 	//cout << croppedImageData->GetReferenceCount() << endl;
-	if(readerFlag == 0 )
+	if(readerFlag == CurrentReaderType::DICOMREADER )
 	{
 	   VascuviewUtility::extractVoi(reader->GetOutput(),bounds,croppedImageData);
-	}else if(readerFlag == 1)
+	}else if(readerFlag == CurrentReaderType::VTIREADER)
 	{
 		VascuviewUtility::extractVoi(readerVti->GetOutput(),bounds,croppedImageData);
 	}
@@ -583,7 +584,7 @@ void QtVTKRenderWindows::openVtiDicom()
 		return;
 	}
 	flag = true;
-	readerFlag = 1 ;
+	readerFlag = CurrentReaderType::VTIREADER;
 	this->ui->statusBar->showMessage(fileName);
 	
 
@@ -592,11 +593,6 @@ void QtVTKRenderWindows::openVtiDicom()
 
 
 
-	//---------------------------------------
-	//this->ui->view4->GetRenderWindow()->ClearInRenderStatus();
-	//  vtkSmartPointer< vtkDICOMImageReader > reader =
-    //vtkSmartPointer< vtkDICOMImageReader >::New();
-  //reader->SetDirectoryName("E:/ZHANG_XIANGJU");
   
 	readerVti->SetFileName(fileName.toStdString().c_str());
     readerVti->Update();
@@ -605,11 +601,7 @@ void QtVTKRenderWindows::openVtiDicom()
   int imageDims[3];
   readerVti->GetOutput()->GetDimensions(imageDims);
 
-  //¼ÇµÃÉ¾³ý
-  //---------------------
-  //if(planeWidget[0] != 0)
-   // cout << planeWidget[0]->GetReferenceCount()<<endl;
-  //-----------------------------------
+
 
   for (int i = 0; i < 3; i++)
     {
@@ -761,4 +753,47 @@ void QtVTKRenderWindows::openVtiDicom()
   this->ui->clickedVtkBoxWidget->setChecked(false);
   this->ui->croppedImageButton->setVisible(false);
 
+}
+
+
+vtkImageData* QtVTKRenderWindows::getCurrentImageData()
+{
+   vtkImageData* data;
+  
+   switch (readerFlag)
+   {
+   case DICOMREADER:
+	   data = reader->GetOutput();
+	   break;
+   case VTIREADER:
+	   data = readerVti->GetOutput();
+	   break;
+   default:
+	   break;
+   }
+
+   return data;
+}
+void QtVTKRenderWindows::extractPixelForVascular()
+{
+	log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
+	log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
+	rootLog.info("void QtVTKRenderWindows::extractPixelForVascular() ¿ªÊ¼ÇÐ¸îÍ¼Ïñ");
+	subLog.info("void QtVTKRenderWindows::extractPixelForVascular()¿ªÊ¼ÇÐ¸îÍ¼Ïñ");
+	
+	vtkImageData*current = getCurrentImageData();
+	
+	if(current == 0 || current->GetReferenceCount() < 1)
+	{
+	    rootLog.info("void QtVTKRenderWindows::extractPixelForVascular()  image is valid");
+	    subLog.info("void QtVTKRenderWindows::extractPixelForVascular() image is valid");
+		return;
+	}
+	vmtkLevelSetSegmentation* vlss = vmtkLevelSetSegmentation::New();
+	
+   
+
+	
+
+	
 }

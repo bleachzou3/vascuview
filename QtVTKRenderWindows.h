@@ -15,6 +15,10 @@
 
 // Forward Qt class declarations
 class Ui_QtVTKRenderWindows;
+enum CurrentReaderType
+{
+	DICOMREADER,VTIREADER
+};
 
 class QtVTKRenderWindows : public QMainWindow
 {
@@ -70,6 +74,7 @@ protected:
  
 
 protected slots:
+	void extractPixelForVascular();
 
 private:
 
@@ -81,13 +86,16 @@ private:
   //初始化一些3d组件,比如说一些vtkDicomImageReader
   void init3DWidget();
 
+  vtkImageData* getCurrentImageData();
+private:
+
   //是否已经打开过图像
   bool flag;
 
   bool boxWidgetOn;
 
   //标记使用哪个reader,0:代表reader,1代表readerVti
-  int readerFlag;
+  CurrentReaderType readerFlag;
   
 };
 

@@ -10,6 +10,18 @@
     <height>793</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>1290</width>
+    <height>793</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1290</width>
+    <height>793</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>QtVTKRenderWindows</string>
   </property>
@@ -74,7 +86,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
