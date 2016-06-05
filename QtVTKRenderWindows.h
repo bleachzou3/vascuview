@@ -29,7 +29,7 @@ public:
   QtVTKRenderWindows();
   ~QtVTKRenderWindows();
 
-public slots:
+private slots:
 
   virtual void slotExit();
   virtual void resliceMode(int);
@@ -54,6 +54,9 @@ public slots:
 
   //进行图像截取并保存
   virtual void croppedImageActivity();
+
+
+  
 protected:
   vtkSmartPointer< vtkResliceImageViewer > riw[3];
   vtkSmartPointer< vtkImagePlaneWidget > planeWidget[3];
@@ -96,6 +99,7 @@ private:
 
   //标记使用哪个reader,0:代表reader,1代表readerVti
   CurrentReaderType readerFlag;
+  vtkRenderer* globalRender;
   
 };
 

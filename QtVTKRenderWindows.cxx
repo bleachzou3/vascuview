@@ -790,7 +790,8 @@ void QtVTKRenderWindows::extractPixelForVascular()
 		return;
 	}
 	vmtkLevelSetSegmentation* vlss = vmtkLevelSetSegmentation::New();
-	
+	vlss->setImage(current);
+	//vlss->setRenderer(Render);
    
 
 	

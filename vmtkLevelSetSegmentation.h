@@ -100,6 +100,10 @@ private:
 public:
 	void Execute();
 
+	void setImage(vtkImageData*_image);
+
+	void setRenderer(vtkRenderer*_render);
+
 
 
 

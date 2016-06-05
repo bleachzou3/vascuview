@@ -479,3 +479,14 @@ void vmtkLevelSetSegmentation::DisplayLevelSetSurface(vtkImageData*_levelSets,do
 
 
 }
+
+
+void vmtkLevelSetSegmentation::setImage(vtkImageData*_image)
+{
+	Image = _image;
+}
+
+void vmtkLevelSetSegmentation::setRenderer(vtkRenderer*_render)
+{
+	Renderer = _render;
+}
