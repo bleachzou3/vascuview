@@ -99,7 +99,10 @@ private:
 
   //标记使用哪个reader,0:代表reader,1代表readerVti
   CurrentReaderType readerFlag;
+
+  //本例生成
   vtkRenderer* globalRender;
+ 
   
 };
 

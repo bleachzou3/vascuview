@@ -42,7 +42,7 @@
 //----------------------------------------------------------------------------
 
 
-QtVTKRenderWindows::QtVTKRenderWindows( ):flag(false),boxWidgetOn(false)
+QtVTKRenderWindows::QtVTKRenderWindows( ):flag(false),boxWidgetOn(false),globalRender(0)
 {
   this->ui = new Ui_QtVTKRenderWindows;
   this->ui->setupUi(this);
@@ -51,7 +51,7 @@ QtVTKRenderWindows::QtVTKRenderWindows( ):flag(false),boxWidgetOn(false)
   connectActions();
  
 
-
+ 
 
 };
 
@@ -167,8 +167,15 @@ void QtVTKRenderWindows::init3DWidget()
   vtkSmartPointer<vtkProperty> ipwProp =
     vtkSmartPointer<vtkProperty>::New();
 
-  vtkSmartPointer< vtkRenderer > ren =
-    vtkSmartPointer< vtkRenderer >::New();
+//  vtkSmartPointer< vtkRenderer > ren =
+ //   vtkSmartPointer< vtkRenderer >::New();
+   if(globalRender != 0 && globalRender->GetReferenceCount() > 0 )
+  {
+	
+	  globalRender->Delete();
+  }
+  
+  globalRender = vtkRenderer::New();
 
  //自己后期添加，想试着在同一个QTVTKrenderer实例中载入不同的图片。
   vtkSmartPointer<vtkRenderWindow> new1 = vtkSmartPointer<vtkRenderWindow>::New();
@@ -182,7 +189,7 @@ void QtVTKRenderWindows::init3DWidget()
 
 
 
-   this->ui->view4->GetRenderWindow()->AddRenderer(ren);
+  this->ui->view4->GetRenderWindow()->AddRenderer(globalRender);
   vtkRenderWindowInteractor *iren = this->ui->view4->GetInteractor();
   boxWidget->SetInteractor(iren);
 
@@ -220,7 +227,7 @@ void QtVTKRenderWindows::init3DWidget()
 		planeWidget[i]->SetSliceIndex(imageDims[i]/2);
 		planeWidget[i]->DisplayTextOn();
 		  
-		planeWidget[i]->SetDefaultRenderer(ren);
+		planeWidget[i]->SetDefaultRenderer(globalRender);
 		  
 		planeWidget[i]->SetWindowLevel(1358, -27);
 		planeWidget[i]->On();
@@ -587,20 +594,23 @@ void QtVTKRenderWindows::openVtiDicom()
 	readerFlag = CurrentReaderType::VTIREADER;
 	this->ui->statusBar->showMessage(fileName);
 	
+	//这个要删除
+	cout << fileName.toStdString() << endl;
 
 
 
 
-
-
+	
   
 	readerVti->SetFileName(fileName.toStdString().c_str());
+	cout << "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh" <<endl;
     readerVti->Update();
-
+	
+	 cout << "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh111111111111111111111111111" <<endl;
 
   int imageDims[3];
   readerVti->GetOutput()->GetDimensions(imageDims);
-
+ 
 
 
   for (int i = 0; i < 3; i++)
@@ -625,7 +635,6 @@ void QtVTKRenderWindows::openVtiDicom()
   this->ui->view3->SetRenderWindow(riw[2]->GetRenderWindow());
   riw[2]->SetupInteractor(
       this->ui->view3->GetRenderWindow()->GetInteractor());
-
   for (int i = 0; i < 3; i++)
     {
     // make them all share the same reslice cursor object.
@@ -650,9 +659,18 @@ void QtVTKRenderWindows::openVtiDicom()
   vtkSmartPointer<vtkProperty> ipwProp =
     vtkSmartPointer<vtkProperty>::New();
 
-  vtkSmartPointer< vtkRenderer > ren =
-    vtkSmartPointer< vtkRenderer >::New();
+  //vtkSmartPointer< vtkRenderer > ren =
+   // vtkSmartPointer< vtkRenderer >::New();
+ 
+  if(globalRender != 0 && globalRender->GetReferenceCount() > 0 )
+  {
+	
+	  globalRender->Delete();
+  }
+  
+  globalRender = vtkRenderer::New();
 
+  
  //自己后期添加，想试着在同一个QTVTKrenderer实例中载入不同的图片。
   vtkSmartPointer<vtkRenderWindow> new1 = vtkSmartPointer<vtkRenderWindow>::New();
   this->ui->view4->SetRenderWindow(new1);
@@ -665,7 +683,7 @@ void QtVTKRenderWindows::openVtiDicom()
 
 
 
-   this->ui->view4->GetRenderWindow()->AddRenderer(ren);
+  this->ui->view4->GetRenderWindow()->AddRenderer(globalRender);
   vtkRenderWindowInteractor *iren = this->ui->view4->GetInteractor();
   boxWidget->SetInteractor(iren);
 
@@ -703,7 +721,7 @@ void QtVTKRenderWindows::openVtiDicom()
 		planeWidget[i]->SetSliceIndex(imageDims[i]/2);
 		planeWidget[i]->DisplayTextOn();
 		  
-		planeWidget[i]->SetDefaultRenderer(ren);
+		planeWidget[i]->SetDefaultRenderer(globalRender);
 		  
 		planeWidget[i]->SetWindowLevel(1358, -27);
 		planeWidget[i]->On();
