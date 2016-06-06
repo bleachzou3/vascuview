@@ -36,7 +36,7 @@ void vmtkImageFeature::BuildVTKGradientBasedFeatureImage(vtkImageData*originalDa
 	 log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1")); 
 	if(res == 0)
 	{
-		throw  NullPointerException("BuildUpwindGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)：res是空指针，请初始化");
+		throw  NullPointerException("BuildVTKGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)：res是空指针，请初始化");
 	}
 	rootLog.info("void vmtkImageFeature::BuildVTKGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData*res) start......");
 	subLog.info("void vmtkImageFeature::BuildVTKGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData*res) start......");
@@ -78,7 +78,7 @@ void vmtkImageFeature::BuildFWHMBasedFeatureImage(vtkImageData*originalData,vtkI
 	    log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1")); 
 	    if(res == 0)
 		{
-			throw NullPointerException("BuildUpwindGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)：res是空指针，请初始化");
+			throw NullPointerException("BuildFWHMBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)：res是空指针，请初始化");
 		}
 		rootLog.info("void vmtkImageFeature::BuildFWHMBasedFeatureImage(vtkImageData*originalData,vtkImageData* res) start......");
 		subLog.info("void vmtkImageFeature::BuildFWHMBasedFeatureImage(vtkImageData*originalData,vtkImageData* res) start.......");
@@ -139,7 +139,7 @@ void vmtkImageFeature::BuildUpwindGradientBasedFeatureImage(vtkImageData*origina
         else
 		{
             
-			vtkSmartPointer<vtkvmtkBoundedReciprocalImageFilter> boundedReciprocal = vtkSmartPointer<vtkvmtkBoundedReciprocalImageFilter>::New();
+			vtkSmartPointer<vtkvmtkBoundedReciprocalImageFilter> boundedReciprocal = vtkSmartPointer<vtkvmtkBoundedReciprocalImageFilter>::New();	
             boundedReciprocal->SetInputConnection(gradientMagnitude->GetOutputPort());
             boundedReciprocal->Update();
             featureImage = boundedReciprocal->GetOutput();
@@ -153,35 +153,51 @@ void vmtkImageFeature::BuildGradientBasedFeatureImage(vtkImageData*originalData,
 	    log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1")); 
 		if(res == 0||res->GetReferenceCount() < 1)
 		{
-			throw NullPointerException("BuildUpwindGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)：res是空指针，请初始化");
+			throw NullPointerException("BuildGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)：res是空指针，请初始化");
 		}
 		rootLog.info("void vmtkImageFeature::BuildGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)  start.....");
 		subLog.info("void vmtkImageFeature::BuildGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)  start.....");
 		vtkSmartPointer<vtkImageCast> cast = vtkSmartPointer<vtkImageCast>::New();        
 		cast->SetInputData(originalData);
+		
         cast->SetOutputScalarTypeToFloat();
+		
         cast->Update();
-		vtkSimpleImageToImageFilter*gradientMagnitude;
+
+		rootLog.debug("void vmtkImageFeature::BuildGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)  getting ImageFilter.....");
+		subLog.debug("void vmtkImageFeature::BuildGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)  getting ImageFilter.....");
+		vtkSimpleImageToImageFilter*gradientMagnitude = 0;
+
+		vtkImageData* tempData = 0;
         if (DerivativeSigma > 0.0)
 		{
 			vtkvmtkGradientMagnitudeRecursiveGaussianImageFilter* gradientMagnitude2 = vtkvmtkGradientMagnitudeRecursiveGaussianImageFilter::New();
-            gradientMagnitude2->SetInputConnection(cast->GetOutputPort());
+
+			gradientMagnitude2->SetInputData(cast->GetOutput());
+            //gradientMagnitude2->SetInputConnection(cast->GetOutputPort());
             gradientMagnitude2->SetSigma(DerivativeSigma);
             gradientMagnitude2->SetNormalizeAcrossScale(0);
             gradientMagnitude2->Update();
 			gradientMagnitude = gradientMagnitude2;
+			tempData = gradientMagnitude2->GetOutput();
 		}
         else
 		{
             
 		    vtkvmtkGradientMagnitudeImageFilter* gradientMagnitude3 = vtkvmtkGradientMagnitudeImageFilter::New();
 				
-            gradientMagnitude3->SetInputConnection(cast->GetOutputPort());
+			gradientMagnitude3->SetInputData(cast->GetOutput());
+            //gradientMagnitude3->SetInputConnection(cast->GetOutputPort());
+			
             gradientMagnitude3->Update();
+		    
 			gradientMagnitude = gradientMagnitude3;
+			tempData = gradientMagnitude3->GetOutput();
 		}
         //featureImage = None
-		vtkImageData* featureImage;
+		rootLog.debug("void vmtkImageFeature::BuildGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)  getting FeatureImage.....");
+		subLog.debug("void vmtkImageFeature::BuildGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)  getting FeatureImage.....");
+		vtkSmartPointer<vtkImageData> featureImage;
         if (SigmoidRemapping==1)
 		{
             double*scalarRange =  gradientMagnitude->GetOutput()->GetPointData()->GetScalars()->GetRange();
@@ -190,7 +206,7 @@ void vmtkImageFeature::BuildGradientBasedFeatureImage(vtkImageData*originalData,
             double  alpha = - (inputMaximum - inputMinimum) / 6.0;
             double  beta = (inputMaximum + inputMinimum) / 2.0;
 			vtkSmartPointer<vtkvmtkSigmoidImageFilter> sigmoid = vtkSmartPointer<vtkvmtkSigmoidImageFilter>::New();
-            sigmoid->SetInputConnection(gradientMagnitude->GetOutputPort());
+			sigmoid->SetInputData(tempData);
             sigmoid->SetAlpha(alpha);
             sigmoid->SetBeta(beta);
             sigmoid->SetOutputMinimum(0.0);
@@ -202,10 +218,15 @@ void vmtkImageFeature::BuildGradientBasedFeatureImage(vtkImageData*originalData,
 		{
 
 			vtkSmartPointer<vtkvmtkBoundedReciprocalImageFilter> boundedReciprocal = vtkSmartPointer<vtkvmtkBoundedReciprocalImageFilter>::New();
-            boundedReciprocal->SetInputData(gradientMagnitude->GetOutput());
-            boundedReciprocal->Update();
+			
+			boundedReciprocal->SetInputData(tempData);
+		
+
+             boundedReciprocal->Update();
+		
             featureImage = boundedReciprocal->GetOutput();
 		}
+	
 		res->DeepCopy(featureImage);
 		gradientMagnitude->Delete();
 }

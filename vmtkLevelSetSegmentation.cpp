@@ -262,7 +262,7 @@ void vmtkLevelSetSegmentation::Execute()
 
 	log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
 	log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
-	if(Image == 0)
+	if(Image == 0&& Image->GetReferenceCount() < 1)
 	{
 		rootLog.error("Error:vmtkLevelSetSegmentation::Execute()没有图像");
 		subLog.error("Error:vmtkLevelSetSegmentation::Execute()没有图像");
@@ -274,7 +274,12 @@ void vmtkLevelSetSegmentation::Execute()
 	cast->SetInputData(Image);
 	cast->SetOutputScalarTypeToFloat();
 	cast->Update();
-	Image = cast->GetOutput();
+	
+	vtkImageData* tempImage = Image;
+	Image = vtkImageData::New();
+	Image->DeepCopy(cast->GetOutput());
+	tempImage->Delete();
+
 	
 	if(InitializationImage == 0 || InitializationImage->GetReferenceCount() < 1)
 	{
