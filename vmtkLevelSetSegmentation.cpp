@@ -13,7 +13,7 @@
 #include "ThresholdDialog.h"
 #include "YNDialog.h"
 vtkStandardNewMacro(vmtkLevelSetSegmentation);
-vmtkLevelSetSegmentation::vmtkLevelSetSegmentation()
+vmtkLevelSetSegmentation::vmtkLevelSetSegmentation():Image(0),InitializationImage(0),FeatureImage(0),ImageSeeder(0),SurfaceViewer(0),Renderer(0),LevelSets(0),InitialLevelSets(0),LevelSetsInput(0),LevelSetsOutput(0)
 {
 	    PropagationScaling = 0.0;
         CurvatureScaling = 0.0;
@@ -76,6 +76,8 @@ void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC()
 			rootLog.info("void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC() FeatureImage,LevelSetsInput,Invalid");
 			return;
 		}
+		subLog.info("void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC() start...");
+		rootLog.info("void vmtkLevelSetSegmentation::LevelSetEvolutionGEODESIC() start...");
 		vtkSmartPointer<vtkvmtkGeodesicActiveContourLevelSetImageFilter> levelSetsG = vtkSmartPointer<vtkvmtkGeodesicActiveContourLevelSetImageFilter>::New();	
 		levelSetsG->SetFeatureImage(FeatureImage);
 		levelSetsG->SetDerivativeSigma(FeatureDerivativeSigma);
@@ -257,6 +259,7 @@ void vmtkLevelSetSegmentation::MergeLevelSet()
 
 void vmtkLevelSetSegmentation::Execute()
 {
+
 	log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
 	log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
 	if(Image == 0)
@@ -265,20 +268,23 @@ void vmtkLevelSetSegmentation::Execute()
 		subLog.error("Error:vmtkLevelSetSegmentation::Execute()Ã»ÓÐÍ¼Ïñ");
 		return;
 	}
-
+	rootLog.debug("Error:vmtkLevelSetSegmentation::Execute()start...");
+	subLog.debug("Error:vmtkLevelSetSegmentation::Execute()start...");
 	vtkSmartPointer<vtkImageCast> cast = vtkSmartPointer<vtkImageCast>::New();
 	cast->SetInputData(Image);
 	cast->SetOutputScalarTypeToFloat();
 	cast->Update();
 	Image = cast->GetOutput();
-
+	
 	if(InitializationImage == 0 || InitializationImage->GetReferenceCount() < 1)
 	{
 		InitializationImage = vtkImageData::New();
 		InitializationImage->DeepCopy(Image);
 	}
 
-	if(FeatureImage == 0)
+	rootLog.debug("info:vmtkLevelSetSegmentation::Execute()  getting Feature Image");
+	subLog.debug("info:vmtkLevelSetSegmentation::Execute() getting Feature Image");
+	if(FeatureImage == 0||FeatureImage->GetReferenceCount() < 1)
 	{
 		FeatureImage = vtkImageData::New();
 		
@@ -322,7 +328,8 @@ void vmtkLevelSetSegmentation::Execute()
          
 	}
 
-
+	rootLog.debug("info:vmtkLevelSetSegmentation::Execute()  initialize ImageSeeder and surfaceViewer");
+	subLog.debug("info:vmtkLevelSetSegmentation::Execute() initialize ImageSeeder and surfaceViewer");
 	ImageSeeder = vmtkImageSeeder::New();
 	ImageSeeder->setRenderer(Renderer);
 	ImageSeeder->setImage(InitializationImage);

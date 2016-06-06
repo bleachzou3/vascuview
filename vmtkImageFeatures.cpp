@@ -9,6 +9,8 @@
 #include "vtkvmtkGradientMagnitudeRecursiveGaussianImageFilter.h"
 #include "vtkvmtkGradientMagnitudeImageFilter.h"
 #include <vtkObjectFactory.h>
+#include <log4cpp/Category.hh>
+#include <log4cpp/PropertyConfigurator.hh>
 vtkStandardNewMacro(vmtkImageFeature);
 vmtkImageFeature::vmtkImageFeature()
 {
@@ -30,10 +32,15 @@ vmtkImageFeature::~vmtkImageFeature()
 
 void vmtkImageFeature::BuildVTKGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData*res)
 {
+     log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
+	 log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1")); 
 	if(res == 0)
 	{
 		throw  NullPointerException("BuildUpwindGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)：res是空指针，请初始化");
 	}
+	rootLog.info("void vmtkImageFeature::BuildVTKGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData*res) start......");
+	subLog.info("void vmtkImageFeature::BuildVTKGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData*res) start......");
+
 	vtkSmartPointer<vtkImageCast> cast = vtkSmartPointer<vtkImageCast>::New();
 	cast->SetInputData(originalData);
 	cast->SetOutputScalarTypeToFloat();       
@@ -67,10 +74,14 @@ void vmtkImageFeature::BuildVTKGradientBasedFeatureImage(vtkImageData*originalDa
 
 void vmtkImageFeature::BuildFWHMBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)
 {
+	    log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
+	    log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1")); 
 	    if(res == 0)
 		{
 			throw NullPointerException("BuildUpwindGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)：res是空指针，请初始化");
 		}
+		rootLog.info("void vmtkImageFeature::BuildFWHMBasedFeatureImage(vtkImageData*originalData,vtkImageData* res) start......");
+		subLog.info("void vmtkImageFeature::BuildFWHMBasedFeatureImage(vtkImageData*originalData,vtkImageData* res) start.......");
 		vtkSmartPointer<vtkImageCast> cast = vtkSmartPointer<vtkImageCast>::New();        
 		cast->SetInputData(originalData);
         cast->SetOutputScalarTypeToFloat();
@@ -88,10 +99,14 @@ void vmtkImageFeature::BuildFWHMBasedFeatureImage(vtkImageData*originalData,vtkI
 
 void vmtkImageFeature::BuildUpwindGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)
 {
+	    log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
+	    log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1")); 
 	    if(res == 0)
 		{
 			throw NullPointerException("BuildUpwindGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)：res是空指针，请初始化");
 		}
+		rootLog.info("void vmtkImageFeature::BuildUpwindGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res) start......");
+		subLog.info("void vmtkImageFeature::BuildUpwindGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res) start......");
 		vtkSmartPointer<vtkImageCast> cast = vtkSmartPointer<vtkImageCast>::New();        
 		cast->SetInputData(originalData);
         cast->SetOutputScalarTypeToFloat();
@@ -134,10 +149,14 @@ void vmtkImageFeature::BuildUpwindGradientBasedFeatureImage(vtkImageData*origina
 
 void vmtkImageFeature::BuildGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)
 {
-	    if(res == 0)
+	    log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
+	    log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1")); 
+		if(res == 0||res->GetReferenceCount() < 1)
 		{
 			throw NullPointerException("BuildUpwindGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)：res是空指针，请初始化");
 		}
+		rootLog.info("void vmtkImageFeature::BuildGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)  start.....");
+		subLog.info("void vmtkImageFeature::BuildGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res)  start.....");
 		vtkSmartPointer<vtkImageCast> cast = vtkSmartPointer<vtkImageCast>::New();        
 		cast->SetInputData(originalData);
         cast->SetOutputScalarTypeToFloat();

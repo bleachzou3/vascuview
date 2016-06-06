@@ -42,7 +42,7 @@
 //----------------------------------------------------------------------------
 
 
-QtVTKRenderWindows::QtVTKRenderWindows( ):flag(false),boxWidgetOn(false),globalRender(0)
+QtVTKRenderWindows::QtVTKRenderWindows( ):flag(false),boxWidgetOn(false),globalRender(0),readerVti(0)
 {
   this->ui = new Ui_QtVTKRenderWindows;
   this->ui->setupUi(this);
@@ -61,7 +61,7 @@ void QtVTKRenderWindows::init3DWidget()
 {
 
 	 reader =  vtkSmartPointer< vtkDICOMImageReader >::New();
-	 readerVti = vtkSmartPointer<vtkXMLImageDataReader>::New();
+	
 	 cubeActor = vtkSmartPointer<vtkActor>::New();
 	 cubeSource = vtkSmartPointer<vtkCubeSource>::New();
 }
@@ -308,6 +308,7 @@ void QtVTKRenderWindows::connectActions()
   connect(this->ui->actionOpenDicomDirectory,SIGNAL(triggered()),this,SLOT(openDirectoryDicom()));
   connect(this->ui->croppedImageButton,SIGNAL(clicked()),this,SLOT(croppedImageActivity()));
   connect(this->ui->actionActionOpenVti,SIGNAL(triggered()),this,SLOT(openVtiDicom()));
+  connect(this->ui->enterCutModeButton,SIGNAL(clicked()),this,SLOT(extractPixelForVascular()));
 
 }
 void QtVTKRenderWindows::slotExit()
@@ -495,6 +496,11 @@ QtVTKRenderWindows:: ~QtVTKRenderWindows()
 	{
 	  boxWidget->Off();
 	}
+
+	if(readerVti != 0&& readerVti->GetReferenceCount() > 0)
+	{
+		readerVti->Delete();
+	}
 }
 
 /**
@@ -576,6 +582,8 @@ void QtVTKRenderWindows::croppedImageActivity()
 void QtVTKRenderWindows::openVtiDicom()
 {
 	cout << "helloOpenVtiDicom" << endl;
+
+
 	QString fileName = QFileDialog::getOpenFileName(this,  
                                                 tr("打开文件"),  
                                                 "/",  
@@ -598,19 +606,19 @@ void QtVTKRenderWindows::openVtiDicom()
 	cout << fileName.toStdString() << endl;
 
 
+	if(readerVti!= 0&&readerVti->GetReferenceCount() > 0 )
+		readerVti->Delete();
 
-
-	
-  
+	readerVti = vtkXMLImageDataReader::New();
 	readerVti->SetFileName(fileName.toStdString().c_str());
-	cout << "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh" <<endl;
-    readerVti->Update();
-	
-	 cout << "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh111111111111111111111111111" <<endl;
+  
+
+	readerVti->Update();
+
 
   int imageDims[3];
-  readerVti->GetOutput()->GetDimensions(imageDims);
  
+  readerVti->GetOutput()->GetDimensions(imageDims);
 
 
   for (int i = 0; i < 3; i++)
@@ -646,7 +654,7 @@ void QtVTKRenderWindows::openVtiDicom()
     rep->GetResliceCursorActor()->
       GetCursorAlgorithm()->SetReslicePlaneNormal(i);
 
-    riw[i]->SetInputData(readerVti->GetOutput());
+	riw[i]->SetInputData(readerVti->GetOutput());
     riw[i]->SetSliceOrientation(i);
     riw[i]->SetResliceModeToAxisAligned();
 	
@@ -776,7 +784,7 @@ void QtVTKRenderWindows::openVtiDicom()
 
 vtkImageData* QtVTKRenderWindows::getCurrentImageData()
 {
-   vtkImageData* data;
+   vtkImageData* data = 0;
   
    switch (readerFlag)
    {
@@ -809,6 +817,9 @@ void QtVTKRenderWindows::extractPixelForVascular()
 	}
 	vmtkLevelSetSegmentation* vlss = vmtkLevelSetSegmentation::New();
 	vlss->setImage(current);
+	vlss->setRenderer(globalRender);
+	
+	vlss->Execute();
 	//vlss->setRenderer(Render);
    
 

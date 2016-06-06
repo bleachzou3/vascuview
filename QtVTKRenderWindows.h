@@ -69,12 +69,12 @@ protected:
    vtkSmartPointer< vtkDICOMImageReader > reader ;
 
    //读取某个vti文件
-   vtkSmartPointer<vtkXMLImageDataReader> readerVti;
+   vtkXMLImageDataReader* readerVti;
    
    vtkSmartPointer<vtkActor> cubeActor;
    vtkSmartPointer<vtkCubeSource> cubeSource; 
   
- 
+   
 
 protected slots:
 	void extractPixelForVascular();
