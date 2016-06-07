@@ -818,7 +818,12 @@ void QtVTKRenderWindows::extractPixelForVascular()
 	vmtkLevelSetSegmentation* vlss = vmtkLevelSetSegmentation::New();
 	vlss->setImage(current);
 	vlss->setRenderer(globalRender);
-	
+	vtkImagePlaneWidget*tempPlaneWidgt[3];
+	for(int i = 0; i < 3; i++)
+	{
+		tempPlaneWidgt[i] = planeWidget[i];
+	}
+	vlss->setPlaneWidget(tempPlaneWidgt);
 	vlss->Execute();
 	//vlss->setRenderer(Render);
    

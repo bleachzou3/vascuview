@@ -70,6 +70,9 @@ private:
 	//这个类分配的内存
 	vtkImageData*LevelSetsOutput;
 
+	//外部分配的
+	vtkImagePlaneWidget* planeWidget[3];
+
 public:
 	static vmtkLevelSetSegmentation* New();
 	vtkTypeMacro(vmtkLevelSetSegmentation,vtkObjectBase);
@@ -103,6 +106,8 @@ public:
 	void setImage(vtkImageData*_image);
 
 	void setRenderer(vtkRenderer*_render);
+
+	void setPlaneWidget(vtkImagePlaneWidget* _palneWidget[3]);
 
 
 

@@ -15,6 +15,11 @@
 vtkStandardNewMacro(vmtkLevelSetSegmentation);
 vmtkLevelSetSegmentation::vmtkLevelSetSegmentation():Image(0),InitializationImage(0),FeatureImage(0),ImageSeeder(0),SurfaceViewer(0),Renderer(0),LevelSets(0),InitialLevelSets(0),LevelSetsInput(0),LevelSetsOutput(0)
 {
+
+	    for(int i = 0; i < 3; i++)
+		{
+			planeWidget[i] = 0;
+		}
 	    PropagationScaling = 0.0;
         CurvatureScaling = 0.0;
         AdvectionScaling = 1.0;
@@ -268,6 +273,16 @@ void vmtkLevelSetSegmentation::Execute()
 		subLog.error("Error:vmtkLevelSetSegmentation::Execute()Ã»ÓÐÍ¼Ïñ");
 		return;
 	}
+	for(int i = 0; i < 3; i++)
+	{
+		if(planeWidget[i] == 0 || planeWidget[i]->GetReferenceCount() < 1)
+		{
+			rootLog.error("Error:vmtkLevelSetSegmentation::Execute() vtkPlaneWidget invalid");
+		    subLog.error("Error:vmtkLevelSetSegmentation::Execute() vtkPlaneWidget invalid");
+			return;
+		}
+	}
+
 	rootLog.debug("Error:vmtkLevelSetSegmentation::Execute()start...");
 	subLog.debug("Error:vmtkLevelSetSegmentation::Execute()start...");
 	vtkSmartPointer<vtkImageCast> cast = vtkSmartPointer<vtkImageCast>::New();
@@ -501,4 +516,13 @@ void vmtkLevelSetSegmentation::setImage(vtkImageData*_image)
 void vmtkLevelSetSegmentation::setRenderer(vtkRenderer*_render)
 {
 	Renderer = _render;
+}
+
+
+void vmtkLevelSetSegmentation::setPlaneWidget(vtkImagePlaneWidget* _planeWidget[3])
+{
+	for(int i = 0; i < 3; i++)
+	{
+		planeWidget[i] = _planeWidget[i];
+	}
 }

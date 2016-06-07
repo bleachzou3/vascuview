@@ -29,12 +29,15 @@ void vmtkImageSeeder::execute()
 		return;
 	}
 
+	rootLog.info("vmtkImageSeeder::execute() start..........");
+	subLog.info("vmtkImageSeeder::execute(), start.........");
     Picker = vtkSmartPointer<vtkCellPicker>::New();
 	Picker->SetTolerance(0.005);
 
 	vtkSmartPointer<vtkAddSeedCallBack> vasc = vtkSmartPointer<vtkAddSeedCallBack>::New();
 	for(int i = 0; i < 3; i++)
 	{
+		cout << planes[i] << endl;
 		planes[i]->AddObserver(vtkCommand::StartInteractionEvent,vasc);		
 	}
 
