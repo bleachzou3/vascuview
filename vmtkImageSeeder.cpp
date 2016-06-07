@@ -11,6 +11,13 @@ vmtkImageSeeder::vmtkImageSeeder()
 	Display = 1;
 	ArrayName = "";
 	KeepSeeds = 0;
+	for(int i = 0; i < 3; i++)
+	{
+		planes[i] = 0 ;
+	}
+
+	Image = 0;
+	Renderer = 0;
 }
 
 vmtkImageSeeder::~vmtkImageSeeder()
@@ -35,9 +42,16 @@ void vmtkImageSeeder::execute()
 	Picker->SetTolerance(0.005);
 
 	vtkSmartPointer<vtkAddSeedCallBack> vasc = vtkSmartPointer<vtkAddSeedCallBack>::New();
+
 	for(int i = 0; i < 3; i++)
 	{
-		cout << planes[i] << endl;
+	  	
+	}
+
+	for(int i = 0; i < 3; i++)
+	{
+		
+		
 		planes[i]->AddObserver(vtkCommand::StartInteractionEvent,vasc);		
 	}
 
@@ -127,3 +141,15 @@ void vmtkImageSeeder::setImage(vtkImageData*_image)
 	Image = _image;
 }
 
+void vmtkImageSeeder::setPlaneWidget(vtkImagePlaneWidget*_planeWidget[3])
+{
+	for(int i = 0; i < 3; i++ )
+	{
+	   
+		planes[i] = _planeWidget[i];
+		cout << "void vmtkImageSeeder::setPlaneWidget(vtkImagePlaneWidget*_planeWidget[3])" << _planeWidget[i] << ":" << planes[i] << endl;
+	
+	}
+	
+
+}

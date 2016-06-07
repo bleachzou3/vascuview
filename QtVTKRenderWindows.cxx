@@ -822,6 +822,7 @@ void QtVTKRenderWindows::extractPixelForVascular()
 	for(int i = 0; i < 3; i++)
 	{
 		tempPlaneWidgt[i] = planeWidget[i];
+		cout << "void QtVTKRenderWindows::extractPixelForVascular():" << planeWidget[i] << ":" << tempPlaneWidgt[i] << endl; 
 	}
 	vlss->setPlaneWidget(tempPlaneWidgt);
 	vlss->Execute();

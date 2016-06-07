@@ -352,6 +352,7 @@ void vmtkLevelSetSegmentation::Execute()
 	subLog.debug("info:vmtkLevelSetSegmentation::Execute() initialize ImageSeeder and surfaceViewer");
 	ImageSeeder = vmtkImageSeeder::New();
 	ImageSeeder->setRenderer(Renderer);
+	ImageSeeder->setPlaneWidget(planeWidget);
 	ImageSeeder->setImage(InitializationImage);
 	ImageSeeder->setDisplay(0);
 	ImageSeeder->execute();
@@ -523,6 +524,8 @@ void vmtkLevelSetSegmentation::setPlaneWidget(vtkImagePlaneWidget* _planeWidget[
 {
 	for(int i = 0; i < 3; i++)
 	{
+		
 		planeWidget[i] = _planeWidget[i];
+		cout << "void vmtkLevelSetSegmentation::setPlaneWidget(vtkImagePlaneWidget* _planeWidget[3])" << _planeWidget[i] << ":" << planeWidget[i] << endl;
 	}
 }

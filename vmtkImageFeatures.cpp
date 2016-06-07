@@ -236,4 +236,5 @@ void vmtkImageFeature::BuildGradientBasedFeatureImage(vtkImageData*originalData,
 	
 		res->DeepCopy(featureImage);
 		gradientMagnitude->Delete();
+		
 }

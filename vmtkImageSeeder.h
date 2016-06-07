@@ -53,6 +53,9 @@ private:
 	*
 	*/
 	vtkSmartPointer<vtkActor> SeedActor;
+
+
+
 	std::string ArrayName;
 
 private:
@@ -73,6 +76,8 @@ public:
 	void setImage(vtkImageData*_image);
 
 	void setDisplay(int display);
+
+	void setPlaneWidget(vtkImagePlaneWidget*_planeWidget[3]);
 
 	vtkPolyData* getSeeds();
 
