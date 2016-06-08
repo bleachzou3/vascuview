@@ -238,3 +238,33 @@ void vmtkImageFeature::BuildGradientBasedFeatureImage(vtkImageData*originalData,
 		gradientMagnitude->Delete();
 		
 }
+
+void vmtkImageFeature::setSigmoidRemapping(int _sigmoidRemapping)
+{
+	SigmoidRemapping = _sigmoidRemapping;
+}
+
+void vmtkImageFeature::setDerivativeSigma(double _derivativeSigma)
+{
+  
+	DerivativeSigma = _derivativeSigma;
+}
+
+void vmtkImageFeature::setUpwindFactor(double _upWindFactor)
+{
+	UpwindFactor = _upWindFactor;
+}
+
+void vmtkImageFeature::setFWHMRadius(int _FWHMRaidus[3])
+{
+	for(int i = 0; i < 3; i++)
+	{
+	   FWHMRadius[i] = _FWHMRaidus[i];
+	}
+
+}
+
+void vmtkImageFeature::setFWHMBackgroundValue(double _FWHMBackgroundValue)
+{
+	FWHMBackgroundValue = _FWHMBackgroundValue;
+}

@@ -19,14 +19,19 @@ private:
   int Dimensionality;
   double DerivativeSigma;
   int SigmoidRemapping;
-  double UpwindFactor;
+ 
   int FWHMRadius[3];
   
   double FWHMBackgroundValue;
+
+  double UpwindFactor;
 protected:
 	vmtkImageFeature();
 	virtual ~vmtkImageFeature();
 public:
+
+	
+
 	static vmtkImageFeature* New();
 	vtkTypeMacro(vmtkImageFeature,vtkObjectBase);
 	//originalData是原始图像,res图像是结果图像，传进来之前已经初始化，或者说已经分配内存，不是在这个函数内部分配内存
@@ -42,6 +47,18 @@ public:
 
 	//originalData是原始图像,res图像是结果图像，传进来之前已经初始化，或者说已经分配内存，不是在这个函数内部分配内存
 	void BuildGradientBasedFeatureImage(vtkImageData*originalData,vtkImageData* res);
+
+	//
+	void setSigmoidRemapping(int _sigmoidRemapping);
+    
+	//
+	void setDerivativeSigma(double _DerivativeSigma);
+
+	void setUpwindFactor(double _upwindFactor);
+
+	void setFWHMRadius(int _FWHMRadius[3]);
+
+	void setFWHMBackgroundValue(double _FWHMBackgroundValue);
 };
 
 #endif

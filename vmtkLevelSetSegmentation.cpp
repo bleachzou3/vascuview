@@ -289,17 +289,14 @@ void vmtkLevelSetSegmentation::Execute()
 	cast->SetInputData(Image);
 	cast->SetOutputScalarTypeToFloat();
 	cast->Update();
-	
-	vtkImageData* tempImage = Image;
-	Image = vtkImageData::New();
-	Image->DeepCopy(cast->GetOutput());
-	tempImage->Delete();
+	Image = cast->GetOutput();
+
+   
 
 	
 	if(InitializationImage == 0 || InitializationImage->GetReferenceCount() < 1)
 	{
-		InitializationImage = vtkImageData::New();
-		InitializationImage->DeepCopy(Image);
+		InitializationImage = Image;
 	}
 
 	rootLog.debug("info:vmtkLevelSetSegmentation::Execute()  getting Feature Image");
