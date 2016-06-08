@@ -17,11 +17,14 @@ enum LevelSetType
 class vmtkLevelSetSegmentation:public vtkObjectBase
 {
 private:
+	int SigmoidRemapping;
 	double FeatureDerivativeSigma;
 	double PropagationScaling;
 	double CurvatureScaling;
 	double AdvectionScaling;
-
+	double UpwindFactor;
+	double FWHMRaidus[3];
+	double FWHMBackgroundValue;
 
 	double EdgeWeight;
 	int SmoothingIterations;

@@ -8,7 +8,7 @@ class ThresholdDialog:public QDialog,public Ui::Threshold
 public:
 	ThresholdDialog(QWidget*parent = 0);
 private slots:
-	void on_lineEdit_textChanged(const QString&);
+	void lineEdit_textChanged(const QString &text);
 };
 
 

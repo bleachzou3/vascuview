@@ -1,5 +1,6 @@
 #include "vmtkImageSeeder.h"
 #include <vtkObjectFactory.h>
+#include "NullPointerException.h"
 vtkStandardNewMacro(vmtkImageSeeder);
 
 vtkPolyData* vmtkImageSeeder::getSeeds()
@@ -29,11 +30,12 @@ void vmtkImageSeeder::execute()
 {
 	log4cpp::Category& rootLog  = log4cpp::Category::getRoot();
 	log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
-	if((Image == 0) & (Display == 1))
+	if((Image == 0||Image->GetReferenceCount() < 1) & (Display == 1))
 	{
 		rootLog.error("vmtkImageSeeder::execute(),Image不能为空");
 		subLog.error("vmtkImageSeeder::execute(),Image不能为空");
-		return;
+	 
+		throw NullPointerException("vmtkImageSeeder::execute(),Image不能为空");
 	}
 
 	rootLog.info("vmtkImageSeeder::execute() start..........");
@@ -43,10 +45,6 @@ void vmtkImageSeeder::execute()
 
 	vtkSmartPointer<vtkAddSeedCallBack> vasc = vtkSmartPointer<vtkAddSeedCallBack>::New();
 
-	for(int i = 0; i < 3; i++)
-	{
-	  	
-	}
 
 	for(int i = 0; i < 3; i++)
 	{

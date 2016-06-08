@@ -93,7 +93,12 @@ void vmtkImageFeature::BuildFWHMBasedFeatureImage(vtkImageData*originalData,vtkI
 		vtkSmartPointer<vtkvmtkFWHMFeatureImageFilter> fwhmFeatureImageFilter = vtkSmartPointer<vtkvmtkFWHMFeatureImageFilter>::New();
         //fwhmFeatureImageFilter->SetInputConnection(cast->GetOutputPort());
 		fwhmFeatureImageFilter->SetInputData(cast->GetOutput());
-        fwhmFeatureImageFilter->SetRadius(FWHMRadius);
+		int _FWHMRadius[3];
+		for(int i = 0; i < 3;i++)
+		{
+			_FWHMRadius[i] = FWHMRadius[i];
+		}
+        fwhmFeatureImageFilter->SetRadius(_FWHMRadius);
         fwhmFeatureImageFilter->SetBackgroundValue(FWHMBackgroundValue);
         fwhmFeatureImageFilter->Update();
 	
@@ -255,7 +260,7 @@ void vmtkImageFeature::setUpwindFactor(double _upWindFactor)
 	UpwindFactor = _upWindFactor;
 }
 
-void vmtkImageFeature::setFWHMRadius(int _FWHMRaidus[3])
+void vmtkImageFeature::setFWHMRadius(double _FWHMRaidus[3])
 {
 	for(int i = 0; i < 3; i++)
 	{

@@ -20,7 +20,7 @@ private:
   double DerivativeSigma;
   int SigmoidRemapping;
  
-  int FWHMRadius[3];
+  double FWHMRadius[3];
   
   double FWHMBackgroundValue;
 
@@ -56,7 +56,7 @@ public:
 
 	void setUpwindFactor(double _upwindFactor);
 
-	void setFWHMRadius(int _FWHMRadius[3]);
+	void setFWHMRadius(double _FWHMRadius[3]);
 
 	void setFWHMBackgroundValue(double _FWHMBackgroundValue);
 };

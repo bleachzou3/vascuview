@@ -77,7 +77,7 @@ void vmtkImageInitialization::execute()
 		while(!endInitialization)
 		{
 			ChooseInitializationType* dialog = new ChooseInitializationType;
-			dialog->show();
+			dialog->exec();
 			//这里到时候要加代码
 			/*
 			if(dialog->collidingfrontsRadioButton->isChecked())
@@ -92,14 +92,14 @@ void vmtkImageInitialization::execute()
 			//询问用户接不接收当前的初始化结果
 			YNDialog* accept = new YNDialog;
 			accept->setMessage("Accept initialization? (y/n)");
-			accept->show();
+			accept->exec();
 			if(accept->YRadioButton->isChecked())
 			{
 				MergeLevelSets();
 				DisplayLevelSetSurface(MergedInitialLevelSets);
 			}
 			accept->setMessage("Initialize another branch? (y/n):");
-			accept->show();
+			accept->exec();
 			if(accept->YRadioButton->isChecked())
 			{
 				endInitialization = false;
@@ -136,7 +136,7 @@ void vmtkImageInitialization::CollidingFrontsInitialize()
 	if(Interactive)
 	{
 		ThresholdDialog* dialog = new ThresholdDialog;
-		dialog->show();
+		dialog->exec();
 		QString upper = dialog->upperThresholdLine->text();
 		QString lower = dialog->lowerThresholdLine->text();
 		UpperThreshold =  upper.toDouble();

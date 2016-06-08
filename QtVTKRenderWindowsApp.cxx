@@ -3,7 +3,7 @@
 #include <log4cpp/Category.hh>
 #include <log4cpp/PropertyConfigurator.hh>
 
-
+#include "ChooseInitializationType.h"
 int main( int argc, char** argv )
 {
 	try
@@ -19,11 +19,11 @@ int main( int argc, char** argv )
 	rootLog.info("程序开始执行");
 	log4cpp::Category& subLog = log4cpp::Category::getInstance(std::string("sub1"));
 	subLog.info("程序开始执行");
+
   // QT Stuff
   QApplication app( argc, argv );
 
   QtVTKRenderWindows myQtVTKRenderWindows;
   myQtVTKRenderWindows.show();
-
   return app.exec();
 }

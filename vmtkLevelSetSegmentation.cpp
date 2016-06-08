@@ -20,6 +20,10 @@ vmtkLevelSetSegmentation::vmtkLevelSetSegmentation():Image(0),InitializationImag
 		{
 			planeWidget[i] = 0;
 		}
+		for(int i = 0; i < 3;i++)
+		{
+			FWHMRaidus[i] = 1.0;
+		}
 	    PropagationScaling = 0.0;
         CurvatureScaling = 0.0;
         AdvectionScaling = 1.0;
@@ -31,10 +35,14 @@ vmtkLevelSetSegmentation::vmtkLevelSetSegmentation():Image(0),InitializationImag
 		SmoothingConductance = 0.8;
 		NumberOfIterations = 0;
 		IsoSurfaceValue = 0.0;
+		SigmoidRemapping = 0;
 
 		NegateForInitialization = 0;
 		levelSetTypeName = LevelSetType::GEODESIC;
 		featureImageTypeName = FeatureImageType::GRADIENT;
+
+		UpwindFactor = 1.0;
+		FWHMBackgroundValue = 0.0;
 }
 
 
@@ -308,7 +316,11 @@ void vmtkLevelSetSegmentation::Execute()
 		if(levelSetTypeName == LevelSetType::GEODESIC || levelSetTypeName ==  LevelSetType::LAPLACIAN)
 		{
 			vmtkImageFeature* imageFeatures = vmtkImageFeature::New();
-			
+			imageFeatures->setSigmoidRemapping(SigmoidRemapping);
+			imageFeatures->setDerivativeSigma(FeatureDerivativeSigma);
+			imageFeatures->setUpwindFactor(UpwindFactor);
+			imageFeatures->setFWHMRadius(FWHMRaidus);
+			imageFeatures->setFWHMBackgroundValue(FWHMBackgroundValue);
 			switch (featureImageTypeName)
 			{
 			case VTKGRADIENT:
